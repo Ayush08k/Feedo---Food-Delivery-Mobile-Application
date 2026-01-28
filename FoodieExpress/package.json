@@ -1,0 +1,8 @@
+{
+  "name": "foodie-express",
+  "private": true,
+  "scripts": {
+    "start:backend": "cd backend && npm run start:dev",
+    "start:frontend": "cd frontend && npm run start"
+  }
+}
