@@ -2,7 +2,6 @@
 
 A full-stack food delivery mobile application built with React Native (Expo) and NestJS, featuring real-time order tracking, restaurant management, and a premium dark-themed UI.
 
-![Feedo Logo](./images/logo%20outer%202.png)
 
 ## 📱 Overview
 
