@@ -361,7 +361,7 @@ This project is licensed under the UNLICENSED License - see the LICENSE file for
 
 ## 📧 Support
 
-For support, email your-email@example.com or open an issue in the GitHub repository.
+For support, email ayushkumar2467@gmail.com or open an issue in the GitHub repository.
 
 ---
 
