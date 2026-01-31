@@ -1,13 +1,23 @@
 import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import DriverDashboard from './DriverDashboard';
-import ProfileScreen from '../profile/ProfileScreen'; // Reusing Profile
+import DriverHomeScreen from './DriverHomeScreen';
+import AvailableOrdersScreen from './AvailableOrdersScreen';
+import DeliveryHistoryScreen from './DeliveryHistoryScreen';
+import DriverProfileScreen from './DriverProfileScreen';
 import DeliveryScreen from './DeliveryScreen';
+import EditProfileScreen from '../profile/EditProfileScreen';
+import VehicleDetailsScreen from './VehicleDetailsScreen';
+import DocumentsScreen from './DocumentsScreen';
+import EarningsReportScreen from './EarningsReportScreen';
+import BankDetailsScreen from './BankDetailsScreen';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
-export default function DriverNavigator() {
+function DriverTabNavigator() {
     return (
         <Tab.Navigator
             screenOptions={({ route }) => ({
@@ -25,12 +35,14 @@ export default function DriverNavigator() {
                 tabBarIcon: ({ focused, color, size }) => {
                     let iconName: keyof typeof Ionicons.glyphMap;
 
-                    if (route.name === 'Dashboard') {
+                    if (route.name === 'Home') {
                         iconName = focused ? 'speedometer' : 'speedometer-outline';
+                    } else if (route.name === 'Orders') {
+                        iconName = focused ? 'list' : 'list-outline';
+                    } else if (route.name === 'History') {
+                        iconName = focused ? 'time' : 'time-outline';
                     } else if (route.name === 'Profile') {
                         iconName = focused ? 'person' : 'person-outline';
-                    } else if (route.name === 'DriverDelivery') { // Not usually in tab, but for testing
-                        iconName = 'navigate';
                     } else {
                         iconName = 'help';
                     }
@@ -38,15 +50,27 @@ export default function DriverNavigator() {
                 },
             })}
         >
-            <Tab.Screen name="Dashboard" component={DriverDashboard} />
-            {/* Delivery Screen is active task, maybe shouldn't be a tab but stack, doing stack inside AppNavigator is better.
-                For now I'll hide it or just not add it to tabs if accessed via Dashboard.
-                Wait, I need to register it somewhere if I use navigation.navigate('DriverDelivery').
-                I will add it to the stack in AppNavigator instead or add here as a button. 
-                Let's add it to the AppNavigator stack or make this a stack navigator inside. 
-                Actually, simpler: Register it in AppNavigator stack.
-            */}
-            <Tab.Screen name="Profile" component={ProfileScreen} />
+            <Tab.Screen name="Home" component={DriverHomeScreen} options={{ title: 'Dashboard' }} />
+            <Tab.Screen name="Orders" component={AvailableOrdersScreen} options={{ title: 'Available' }} />
+            <Tab.Screen name="History" component={DeliveryHistoryScreen} options={{ title: 'History' }} />
+            <Tab.Screen name="Profile" component={DriverProfileScreen} options={{ title: 'Profile' }} />
         </Tab.Navigator>
+    );
+}
+
+export default function DriverNavigator() {
+    return (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="DriverTabs" component={DriverTabNavigator} />
+            <Stack.Screen name="AvailableOrders" component={AvailableOrdersScreen} />
+            <Stack.Screen name="DeliveryHistory" component={DeliveryHistoryScreen} />
+            <Stack.Screen name="DriverProfile" component={DriverProfileScreen} />
+            <Stack.Screen name="DriverDelivery" component={DeliveryScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen name="VehicleDetails" component={VehicleDetailsScreen} />
+            <Stack.Screen name="Documents" component={DocumentsScreen} />
+            <Stack.Screen name="EarningsReport" component={EarningsReportScreen} />
+            <Stack.Screen name="BankDetails" component={BankDetailsScreen} />
+        </Stack.Navigator>
     );
 }

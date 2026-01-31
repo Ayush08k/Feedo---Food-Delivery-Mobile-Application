@@ -636,7 +636,7 @@ export default function AuthScreen() {
                                 </View>
 
                                 <TouchableOpacity
-                                    onPress={() => navigation.goBack()}
+                                    onPress={() => navigation.navigate('RoleSelection')}
                                     className="mt-10 items-center"
                                 >
                                     <Text className="text-[#666]">← Select a different role</Text>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
@@ -325,46 +325,40 @@ export default function EditProfileScreen() {
     );
 
     return (
-        <View style={{ flex: 1 }}>
-            <Image
-                source={require('../../assets/bg-image.jpg')}
-                style={StyleSheet.absoluteFillObject}
-                resizeMode="cover"
-            />
-            <View className="flex-1 bg-black/67">
-                <SafeAreaView className="flex-1">
-                    <ScrollView
-                        className="flex-1"
-                        showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 24 }}
-                        keyboardShouldPersistTaps="handled"
+        <SafeAreaView className="flex-1 bg-[#121212]">
+            {/* Header */}
+            <View className="px-4 py-4 bg-[#121212] border-b border-[#333]">
+                <View className="flex-row items-center">
+                    <TouchableOpacity
+                        onPress={() => navigation.goBack()}
+                        className="mr-4 p-2 rounded-full bg-[#1E1E1E]"
                     >
-                        <View className="bg-black/50 backdrop-blur-3xl rounded-3xl p-6 border border-white/30">
-                            {/* Header */}
-                            <View className="flex-row items-center mb-6">
-                                <TouchableOpacity onPress={() => navigation.goBack()} className="mr-4">
-                                    <Text className="text-2xl text-white">←</Text>
-                                </TouchableOpacity>
-                                <Text className="text-white text-2xl font-bold">Edit Profile</Text>
-                            </View>
-
-                            {renderProfilePicture()}
-
-                            {role === 'user' && renderCustomerForm()}
-                            {role === 'driver' && renderDriverForm()}
-                            {role === 'restaurant' && renderRestaurantForm()}
-
-                            {/* Save Button */}
-                            <TouchableOpacity
-                                className="w-full bg-[#1DB954] p-4 rounded-xl items-center mt-6 shadow-lg shadow-green-900/50"
-                                onPress={handleSave}
-                            >
-                                <Text className="text-black font-bold text-lg">Save Changes</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </ScrollView>
-                </SafeAreaView>
+                        <Text className="text-white">←</Text>
+                    </TouchableOpacity>
+                    <Text className="text-white text-2xl font-bold">Edit Profile</Text>
+                </View>
             </View>
-        </View>
+
+            <ScrollView
+                className="flex-1 px-4"
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingVertical: 24 }}
+                keyboardShouldPersistTaps="handled"
+            >
+                {renderProfilePicture()}
+
+                {role === 'user' && renderCustomerForm()}
+                {role === 'driver' && renderDriverForm()}
+                {role === 'restaurant' && renderRestaurantForm()}
+
+                {/* Save Button */}
+                <TouchableOpacity
+                    className="w-full bg-[#1DB954] p-4 rounded-xl items-center mt-6 mb-10 shadow-lg shadow-green-900/50"
+                    onPress={handleSave}
+                >
+                    <Text className="text-black font-bold text-lg">Save Changes</Text>
+                </TouchableOpacity>
+            </ScrollView>
+        </SafeAreaView>
     );
 }
