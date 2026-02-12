@@ -4,6 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { View, StatusBar } from 'react-native';
 import AppNavigator from './src/navigation/AppNavigator';
 import { CartProvider } from './src/cart/CartContext';
+import { UserProvider } from './src/utils/UserContext';
 import './global.css';
 
 const DarkTheme = {
@@ -25,11 +26,13 @@ export default function App() {
     <View style={{ flex: 1, backgroundColor: '#121212' }}>
       <StatusBar barStyle="light-content" backgroundColor="#121212" />
       <SafeAreaProvider>
-        <CartProvider>
-          <NavigationContainer theme={DarkTheme}>
-            <AppNavigator />
-          </NavigationContainer>
-        </CartProvider>
+        <UserProvider>
+          <CartProvider>
+            <NavigationContainer theme={DarkTheme}>
+              <AppNavigator />
+            </NavigationContainer>
+          </CartProvider>
+        </UserProvider>
       </SafeAreaProvider>
     </View>
   );

@@ -3,11 +3,17 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MainTabNavigator from './MainTabNavigator';
 import AuthScreen from '../auth/AuthScreen';
 import RestaurantDetailsScreen from '../restaurant/RestaurantDetailsScreen';
+import RestaurantsListScreen from '../restaurant/RestaurantsListScreen';
 import CheckoutScreen from '../cart/CheckoutScreen';
 import CategoriesScreen from '../home/CategoriesScreen';
 import OfferDetailsScreen from '../home/OfferDetailsScreen';
+import BestOffersScreen from '../home/BestOffersScreen';
 import FoodItemDetailsScreen from '../menu/FoodItemDetailsScreen';
 import SearchResultsScreen from '../home/SearchResultsScreen';
+import YourOrdersScreen from '../profile/YourOrdersScreen';
+import ManageAddressesScreen from '../profile/ManageAddressesScreen';
+import PaymentMethodsScreen from '../profile/PaymentMethodsScreen';
+import NotificationsSettingsScreen from '../profile/NotificationsSettingsScreen';
 
 import DriverNavigator from '../driver/DriverNavigator';
 import RestaurantNavigator from '../restaurant-admin/RestaurantNavigator';
@@ -31,6 +37,7 @@ export default function AppNavigator() {
             <Stack.Screen name="Auth" component={AuthScreen} />
             <Stack.Screen name="Main" component={MainTabNavigator} />
             <Stack.Screen name="RestaurantDetails" component={RestaurantDetailsScreen} />
+            <Stack.Screen name="RestaurantsList" component={RestaurantsListScreen} />
             <Stack.Screen
                 name="Categories"
                 component={CategoriesScreen}
@@ -42,9 +49,14 @@ export default function AppNavigator() {
             />
             <Stack.Screen name="Checkout" component={CheckoutScreen} />
             <Stack.Screen name="OfferDetails" component={OfferDetailsScreen} />
+            <Stack.Screen name="BestOffers" component={BestOffersScreen} />
             <Stack.Screen name="FoodItemDetails" component={FoodItemDetailsScreen} />
             <Stack.Screen name="SearchResults" component={SearchResultsScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen name="YourOrders" component={YourOrdersScreen} />
+            <Stack.Screen name="ManageAddresses" component={ManageAddressesScreen} />
+            <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
+            <Stack.Screen name="NotificationsSettings" component={NotificationsSettingsScreen} />
 
             {/* Driver App */}
             <Stack.Screen name="DriverApp" component={DriverNavigator} />

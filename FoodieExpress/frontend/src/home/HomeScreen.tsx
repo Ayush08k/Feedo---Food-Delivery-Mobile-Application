@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { getSuggestions } from '../utils/searchUtils';
 import { getSearchHistory, saveSearchQuery, clearSearchHistory } from '../utils/searchHistoryUtils';
+import { useUser } from '../utils/UserContext';
 
 const CATEGORIES = [
     { id: 1, name: 'Biryani', icon: '🍛' },
@@ -50,6 +51,7 @@ const RESTAURANTS = [
 
 export default function HomeScreen() {
     const navigation = useNavigation();
+    const { profile } = useUser();
     const [showAllCategories, setShowAllCategories] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -159,8 +161,15 @@ export default function HomeScreen() {
                             style={{ width: '30%', height: 44 }}
                             resizeMode="contain"
                         />
-                        <TouchableOpacity className="bg-[#1E1E1E] p-2 rounded-full">
-                            <Text>👤</Text>
+                        <TouchableOpacity className="flex-row items-center bg-[#1E1E1E] px-3 py-2 rounded-full">
+                            <View className="w-8 h-8 rounded-full bg-[#1DB954] items-center justify-center mr-2 overflow-hidden">
+                                {profile?.profileImage ? (
+                                    <Image source={{ uri: profile.profileImage }} className="w-full h-full" resizeMode="cover" />
+                                ) : (
+                                    <Text className="text-sm">👤</Text>
+                                )}
+                            </View>
+                            <Text className="text-white font-semibold">{profile?.name?.split(' ')[0] || 'Guest'}</Text>
                         </TouchableOpacity>
                     </View>
                     <View className="absolute left-0 right-0 items-center" style={{ top: 13, marginLeft: 40 }}>
@@ -358,7 +367,7 @@ export default function HomeScreen() {
                     <View className="mb-6">
                         <View className="flex-row justify-between items-center px-4 mb-4">
                             <Text className="text-white text-xl font-bold">Best Offers</Text>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => (navigation as any).navigate('BestOffers')}>
                                 <Text className="text-[#1DB954]">See All →</Text>
                             </TouchableOpacity>
                         </View>
@@ -389,7 +398,7 @@ export default function HomeScreen() {
                     </View>
 
                     {/* Popular Restaurants */}
-                    <View className="px-4 pb-20">
+                    <View className="px-4 pb-6">
                         <Text className="text-white text-xl font-bold mb-4">Popular Restaurants</Text>
                         {RESTAURANTS.map((rest) => (
                             <TouchableOpacity
@@ -410,6 +419,16 @@ export default function HomeScreen() {
                                 </View>
                             </TouchableOpacity>
                         ))}
+                    </View>
+
+                    {/* Browse All Restaurants Button */}
+                    <View className="px-4 pb-20">
+                        <TouchableOpacity
+                            className="bg-[#1DB954] py-4 rounded-xl items-center shadow-lg shadow-green-900/50"
+                            onPress={() => (navigation as any).navigate('RestaurantsList')}
+                        >
+                            <Text className="text-black font-bold text-lg">🏪 Browse All Restaurants</Text>
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
             </SafeAreaView>

@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User } from '../users/schemas/user.schema';
+import { UserDocument } from '../users/schemas/user.schema';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class AuthService {
 
     async validateUser(email: string, pass: string): Promise<any> {
         const user = await this.usersService.findOneByEmail(email);
-        if (user && (await bcrypt.compare(pass, user['passwordHash']))) {
+        if (user && (await bcrypt.compare(pass, user.passwordHash))) {
             const { passwordHash, ...result } = user.toObject();
             return result;
         }
@@ -40,7 +40,7 @@ export class AuthService {
         const newUser = await this.usersService.create({
             ...userWithoutPassword,
             passwordHash: hashedPassword,
-        });
+        } as any);
         return this.login(newUser.toObject());
     }
 }

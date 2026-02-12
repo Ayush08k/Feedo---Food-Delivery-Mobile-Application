@@ -9,20 +9,20 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 export class UsersService {
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) { }
 
-    async create(createUserDto: CreateUserDto): Promise<User> {
+    async create(createUserDto: CreateUserDto): Promise<UserDocument> {
         const createdUser = new this.userModel(createUserDto);
         return createdUser.save();
     }
 
-    async findOneByEmail(email: string): Promise<User | null> {
+    async findOneByEmail(email: string): Promise<UserDocument | null> {
         return this.userModel.findOne({ email }).exec();
     }
 
-    async findById(userId: string): Promise<User | null> {
+    async findById(userId: string): Promise<UserDocument | null> {
         return this.userModel.findById(userId).select('-passwordHash').exec();
     }
 
-    async updateProfile(userId: string, updateProfileDto: UpdateProfileDto): Promise<User | null> {
+    async updateProfile(userId: string, updateProfileDto: UpdateProfileDto): Promise<UserDocument | null> {
         return this.userModel
             .findByIdAndUpdate(userId, { $set: updateProfileDto }, { new: true })
             .select('-passwordHash')

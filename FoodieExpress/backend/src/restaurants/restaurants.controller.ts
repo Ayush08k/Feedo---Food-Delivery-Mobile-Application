@@ -11,10 +11,14 @@ export class RestaurantsController {
     }
 
     @Get()
-    findAll(@Query('lat') lat?: string, @Query('lon') lon?: string) {
+    findAll(
+        @Query('lat') lat?: string,
+        @Query('lon') lon?: string,
+        @Query('sortBy') sortBy?: string
+    ) {
         const latitude = lat ? parseFloat(lat) : undefined;
         const longitude = lon ? parseFloat(lon) : undefined;
-        return this.restaurantsService.findAll(latitude, longitude);
+        return this.restaurantsService.findAll(latitude, longitude, sortBy);
     }
 
     @Get(':id')

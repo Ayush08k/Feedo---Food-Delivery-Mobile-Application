@@ -9,26 +9,34 @@ export class RestaurantsService {
         @InjectModel(Restaurant.name) private restaurantModel: Model<RestaurantDocument>,
     ) { }
 
-    async create(createRestaurantDto: any): Promise<Restaurant> {
+    async create(createRestaurantDto: any): Promise<RestaurantDocument> {
         const restaurant = new this.restaurantModel(createRestaurantDto);
         return restaurant.save();
     }
 
-    async findAll(lat?: number, lon?: number): Promise<Restaurant[]> {
+    async findAll(lat?: number, lon?: number, sortBy: string = 'rating'): Promise<RestaurantDocument[]> {
+        let query = this.restaurantModel.find();
+
         if (lat && lon) {
-            return this.restaurantModel.find({
+            query = this.restaurantModel.find({
                 location: {
                     $near: {
                         $geometry: { type: 'Point', coordinates: [lon, lat] },
                         $maxDistance: 5000, // 5km radius
                     },
                 },
-            }).exec();
+            });
         }
-        return this.restaurantModel.find().exec();
+
+        // Add sorting - default is by rating descending
+        if (sortBy === 'rating') {
+            query = query.sort({ rating: -1 }); // -1 for descending order
+        }
+
+        return query.exec();
     }
 
-    async findOne(id: string): Promise<Restaurant | null> {
+    async findOne(id: string): Promise<RestaurantDocument | null> {
         return this.restaurantModel.findById(id).exec();
     }
 }

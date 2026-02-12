@@ -13,13 +13,38 @@ Feedo is a modern food delivery platform that connects customers with their favo
 - **User Authentication** - Secure login and registration with JWT-based authentication
 - **Role-Based Access** - Support for Customer, Restaurant Owner, and Driver roles
 - **Browse Restaurants** - Discover restaurants with advanced search and filtering
+  - Sort by ratings (high to low / low to high)
+  - Browse all restaurants screen
+  - Category-based filtering
 - **Menu Exploration** - View detailed menus with categories and item descriptions
 - **Smart Cart System** - Add items to cart with real-time price calculations
 - **Order Management** - Place orders and track order history
+  - Modern orders UI with gradient status bars
+  - Filter orders by status (All, Delivered, In Transit, Cancelled)
+  - Order tracking with real-time updates
+  - Reorder functionality
+  - Rate completed orders
 - **Real-Time Tracking** - Live order status updates using WebSockets
-- **User Profiles** - Manage personal information and view order history
+- **Comprehensive User Profiles** - Complete profile management system
+  - Edit profile with image upload
+  - Global profile sync across app
+  - Profile picture displayed in home screen header
+- **Address Management** - Save and manage delivery addresses
+  - Add multiple addresses (Home, Work, Other)
+  - Set default delivery address
+  - Edit and delete saved addresses
+- **Payment Methods** - Manage payment options
+  - Save credit/debit cards, UPI, and wallets
+  - Set default payment method
+  - Secure payment information storage
+- **Notification Settings** - Customize notification preferences
+  - Order update notifications
+  - Marketing and promotional offers
+  - Multiple channels: Push, Email, SMS
 - **Reviews & Ratings** - Rate restaurants and view community feedback
 - **Offers & Discounts** - Access special deals and promotional offers
+  - Best offers screen with discount sorting
+  - Offer details and redemption
 
 ### 🍽️ For Restaurant Owners
 - **Restaurant Dashboard** - Comprehensive admin panel for restaurant management
@@ -99,15 +124,25 @@ FoodieExpress/
 ├── frontend/               # React Native Mobile App
 │   ├── src/
 │   │   ├── auth/          # Authentication screens
-│   │   ├── home/          # Home screen
-│   │   ├── restaurant/    # Restaurant details
+│   │   ├── home/          # Home screen & categories
+│   │   ├── restaurant/    # Restaurant details & listing
 │   │   ├── menu/          # Menu browsing
-│   │   ├── cart/          # Shopping cart
-│   │   ├── profile/       # User profile
+│   │   ├── cart/          # Shopping cart & checkout
+│   │   ├── profile/       # User profile & settings
+│   │   │   ├── ProfileScreen.tsx
+│   │   │   ├── EditProfileScreen.tsx
+│   │   │   ├── YourOrdersScreen.tsx
+│   │   │   ├── ManageAddressesScreen.tsx
+│   │   │   ├── PaymentMethodsScreen.tsx
+│   │   │   └── NotificationsSettingsScreen.tsx
 │   │   ├── driver/        # Driver interface
 │   │   ├── restaurant-admin/ # Restaurant dashboard
 │   │   ├── navigation/    # Navigation setup
-│   │   └── utils/         # Utility functions
+│   │   └── utils/         # Utility functions & context
+│   │       ├── UserContext.tsx
+│   │       ├── profileUtils.ts
+│   │       ├── searchUtils.ts
+│   │       └── CartContext.tsx
 │   ├── App.tsx            # Root component
 │   └── package.json
 │
@@ -323,15 +358,33 @@ For complete API documentation, visit: `http://localhost:3000/api`
 
 ## 🎯 Features Roadmap
 
+### ✅ Completed
+- [x] User authentication and authorization
+- [x] Restaurant browsing with search and filtering
+- [x] Cart management system
+- [x] Order placement and tracking
+- [x] Profile management with image upload
+- [x] Address management (CRUD operations)
+- [x] Payment methods management
+- [x] Notification settings
+- [x] Modern orders UI with status tracking
+- [x] Best offers section
+- [x] Global profile synchronization
+- [x] Restaurant sorting by ratings
+
+### 🚧 In Progress / Planned
 - [ ] Payment Gateway Integration (Stripe/Razorpay)
-- [ ] Push Notifications
-- [ ] Google Maps Integration
+- [ ] Push Notifications (FCM/APNs)
+- [ ] Google Maps Integration for live tracking
 - [ ] Advanced Analytics Dashboard
-- [ ] Multi-language Support
+- [ ] Multi-language Support (i18n)
 - [ ] Dark/Light Theme Toggle
 - [ ] Voice Search
 - [ ] Loyalty Points System
 - [ ] Social Sharing
+- [ ] Chat support with restaurants
+- [ ] Scheduled orders
+- [ ] Favorite restaurants and dishes
 
 ## 🤝 Contributing
 

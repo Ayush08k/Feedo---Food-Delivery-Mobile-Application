@@ -3,13 +3,15 @@ import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert } fro
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
-import { saveProfileData, loadProfileData, ProfileData } from '../utils/profileUtils';
+import { ProfileData } from '../utils/profileUtils';
 import { useEffect } from 'react';
+import { useUser } from '../utils/UserContext';
 
 export default function EditProfileScreen() {
     const navigation = useNavigation<any>();
     const route = useRoute<any>();
     const { role = 'user' } = route.params || {};
+    const { profile, updateProfile, refreshProfile } = useUser();
 
     // Common fields
     const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -66,40 +68,36 @@ export default function EditProfileScreen() {
 
     useEffect(() => {
         // Load saved profile data on mount
-        const loadProfile = async () => {
-            const savedData = await loadProfileData();
-            if (savedData) {
-                setProfileImage(savedData.profileImage);
-                setName(savedData.name);
-                setPhone(savedData.phone);
-                setEmail(savedData.email);
+        if (profile) {
+            setProfileImage(profile.profileImage);
+            setName(profile.name);
+            setPhone(profile.phone);
+            setEmail(profile.email);
 
-                if (savedData.role === 'user') {
-                    setAddress(savedData.address || '');
-                } else if (savedData.role === 'driver') {
-                    setVehicleType(savedData.vehicleType || 'bike');
-                    setVehicleNumber(savedData.vehicleNumber || '');
-                    setLicenseNumber(savedData.licenseNumber || '');
-                    setDriverAddress(savedData.driverAddress || '');
-                    setBankAccountNumber(savedData.bankAccountNumber || '');
-                    setIfscCode(savedData.ifscCode || '');
-                    setIsAvailable(savedData.isAvailable ?? true);
-                } else if (savedData.role === 'restaurant') {
-                    setRestaurantName(savedData.restaurantName || '');
-                    setOwnerName(savedData.ownerName || '');
-                    setRestaurantPhone(savedData.restaurantPhone || '');
-                    setCuisineType(savedData.cuisineType || '');
-                    setRestaurantAddress(savedData.restaurantAddress || '');
-                    setFssaiLicense(savedData.fssaiLicense || '');
-                    setGstNumber(savedData.gstNumber || '');
-                    setOpeningTime(savedData.openingTime || '09:00 AM');
-                    setClosingTime(savedData.closingTime || '11:00 PM');
-                    setIsOpen(savedData.isOpen ?? true);
-                }
+            if (profile.role === 'user') {
+                setAddress(profile.address || '');
+            } else if (profile.role === 'driver') {
+                setVehicleType(profile.vehicleType || 'bike');
+                setVehicleNumber(profile.vehicleNumber || '');
+                setLicenseNumber(profile.licenseNumber || '');
+                setDriverAddress(profile.driverAddress || '');
+                setBankAccountNumber(profile.bankAccountNumber || '');
+                setIfscCode(profile.ifscCode || '');
+                setIsAvailable(profile.isAvailable ?? true);
+            } else if (profile.role === 'restaurant') {
+                setRestaurantName(profile.restaurantName || '');
+                setOwnerName(profile.ownerName || '');
+                setRestaurantPhone(profile.restaurantPhone || '');
+                setCuisineType(profile.cuisineType || '');
+                setRestaurantAddress(profile.restaurantAddress || '');
+                setFssaiLicense(profile.fssaiLicense || '');
+                setGstNumber(profile.gstNumber || '');
+                setOpeningTime(profile.openingTime || '09:00 AM');
+                setClosingTime(profile.closingTime || '11:00 PM');
+                setIsOpen(profile.isOpen ?? true);
             }
-        };
-        loadProfile();
-    }, []);
+        }
+    }, [profile]);
 
     const handleSave = async () => {
         try {
@@ -135,7 +133,7 @@ export default function EditProfileScreen() {
                 profileData.isOpen = isOpen;
             }
 
-            await saveProfileData(profileData);
+            await updateProfile(profileData);
 
             Alert.alert('Success', 'Profile updated successfully!', [
                 { text: 'OK', onPress: () => navigation.goBack() }

@@ -13,7 +13,7 @@ export default function CartScreen() {
             <SafeAreaView className="flex-1 bg-[#121212] justify-center items-center">
                 <Text className="text-[#A0A0A0] text-xl mb-4">Your cart is empty</Text>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('Home')}
+                    onPress={() => navigation.navigate('RestaurantsList')}
                     className="bg-[#1DB954] px-6 py-3 rounded-full"
                 >
                     <Text className="text-black font-bold">Browse Restaurants</Text>
