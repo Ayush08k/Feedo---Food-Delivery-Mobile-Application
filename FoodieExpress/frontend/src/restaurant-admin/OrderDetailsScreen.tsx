@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useAlert } from '../utils/AlertContext';
 
 export default function OrderDetailsScreen() {
     const navigation = useNavigation<any>();
     const route = useRoute<any>();
     const { order } = route.params || {};
+    const { showAlert } = useAlert();
 
     const [currentStatus, setCurrentStatus] = useState(order?.status || 'pending');
 
@@ -34,11 +36,11 @@ export default function OrderDetailsScreen() {
 
     const updateStatus = (newStatus: string) => {
         setCurrentStatus(newStatus);
-        Alert.alert('Success', `Order status updated to ${newStatus}`);
+        showAlert('Success', `Order status updated to ${newStatus}`);
     };
 
     const cancelOrder = () => {
-        Alert.alert(
+        showAlert(
             'Cancel Order',
             'Are you sure you want to cancel this order?',
             [
@@ -48,7 +50,7 @@ export default function OrderDetailsScreen() {
                     style: 'destructive',
                     onPress: () => {
                         setCurrentStatus('cancelled');
-                        Alert.alert('Order Cancelled', 'The order has been cancelled successfully');
+                        showAlert('Order Cancelled', 'The order has been cancelled successfully');
                     }
                 }
             ]
@@ -141,12 +143,12 @@ export default function OrderDetailsScreen() {
                                     <TouchableOpacity
                                         key={status}
                                         className={`p-4 rounded-xl border-2 ${isCurrentStatus
-                                                ? 'bg-[#1DB954] border-[#1DB954]'
-                                                : isPreviousStatus
-                                                    ? 'bg-[#121212] border-[#666]'
-                                                    : isNextStatus
-                                                        ? 'bg-[#121212] border-[#1DB954]'
-                                                        : 'bg-[#121212] border-[#333]'
+                                            ? 'bg-[#1DB954] border-[#1DB954]'
+                                            : isPreviousStatus
+                                                ? 'bg-[#121212] border-[#666]'
+                                                : isNextStatus
+                                                    ? 'bg-[#121212] border-[#1DB954]'
+                                                    : 'bg-[#121212] border-[#333]'
                                             }`}
                                         onPress={() => isNextStatus && updateStatus(status)}
                                         disabled={!isNextStatus}

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import SearchBarComponent from '../utils/SearchBarComponent';
+import { useAlert } from '../utils/AlertContext';
 
 interface MenuItem {
     id: number;
@@ -16,6 +17,7 @@ interface MenuItem {
 
 export default function MenuManagementScreen() {
     const navigation = useNavigation<any>();
+    const { showAlert } = useAlert();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
 
@@ -43,7 +45,7 @@ export default function MenuManagementScreen() {
     };
 
     const deleteItem = (id: number) => {
-        Alert.alert(
+        showAlert(
             'Delete Item',
             'Are you sure you want to delete this item?',
             [

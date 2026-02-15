@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useCart } from './CartContext';
+import { useAlert } from '../utils/AlertContext';
 
 export default function CheckoutScreen() {
     const navigation = useNavigation<any>();
     const { items, total, clearCart } = useCart();
+    const { showAlert } = useAlert();
     const [loading, setLoading] = useState(false);
     const [address, setAddress] = useState('123 Main St, New York, NY');
 
@@ -16,7 +18,7 @@ export default function CheckoutScreen() {
         setTimeout(() => {
             setLoading(false);
             clearCart();
-            Alert.alert('Order Placed!', 'Your food is on the way.', [
+            showAlert('Order Placed!', 'Your food is on the way.', [
                 { text: 'Track Order', onPress: () => navigation.navigate('Main', { screen: 'Orders' }) },
                 { text: 'Home', onPress: () => navigation.navigate('Main') }
             ]);

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useAlert } from '../utils/AlertContext';
 
 interface Vehicle {
     id: number;
@@ -15,6 +16,7 @@ interface Vehicle {
 
 export default function VehicleDetailsScreen() {
     const navigation = useNavigation<any>();
+    const { showAlert } = useAlert();
     const [showAddVehicle, setShowAddVehicle] = useState(false);
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([
@@ -32,12 +34,12 @@ export default function VehicleDetailsScreen() {
 
     const setActiveVehicle = (id: number) => {
         setVehicles(vehicles.map(v => ({ ...v, isActive: v.id === id })));
-        Alert.alert('Success', 'Active vehicle updated successfully!');
+        showAlert('Success', 'Active vehicle updated successfully!');
     };
 
     const handleAddVehicle = () => {
         if (!newVehicle.number || !newVehicle.model) {
-            Alert.alert('Error', 'Please fill all required fields');
+            showAlert('Error', 'Please fill all required fields');
             return;
         }
 
@@ -50,11 +52,11 @@ export default function VehicleDetailsScreen() {
         setVehicles([...vehicles, vehicle]);
         setNewVehicle({ type: 'bike', number: '', model: '', color: '', year: '' });
         setShowAddVehicle(false);
-        Alert.alert('Success', 'Vehicle added successfully!');
+        showAlert('Success', 'Vehicle added successfully!');
     };
 
     const deleteVehicle = (id: number) => {
-        Alert.alert(
+        showAlert(
             'Delete Vehicle',
             'Are you sure you want to delete this vehicle?',
             [

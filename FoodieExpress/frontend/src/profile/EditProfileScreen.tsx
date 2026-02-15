@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { ProfileData } from '../utils/profileUtils';
 import { useEffect } from 'react';
 import { useUser } from '../utils/UserContext';
+import { useAlert } from '../utils/AlertContext';
+import { usePermissions, PermissionType } from '../hooks/usePermissions';
+import PermissionModal from '../components/PermissionModal';
 
 export default function EditProfileScreen() {
     const navigation = useNavigation<any>();
     const route = useRoute<any>();
     const { role = 'user' } = route.params || {};
     const { profile, updateProfile, refreshProfile } = useUser();
+    const { showAlert } = useAlert();
 
     // Common fields
     const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -46,14 +50,34 @@ export default function EditProfileScreen() {
     // Focus states
     const [focused, setFocused] = useState<string>('');
 
-    const pickImage = async () => {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    // Permission modal state
+    const [showPermissionModal, setShowPermissionModal] = useState(false);
+    const [requestingPermission, setRequestingPermission] = useState<PermissionType | null>(null);
+    const { checkPermissionStatus, requestPermission, getPermissionConfig } = usePermissions();
 
-        if (status !== 'granted') {
-            Alert.alert('Permission Required', 'Sorry, we need camera roll permissions to upload images!');
+    const pickImage = async () => {
+        // Check current permission status
+        const status = await checkPermissionStatus('gallery');
+
+        if (status === 'denied') {
+            // Show permission modal to re-request
+            setRequestingPermission('gallery');
+            setShowPermissionModal(true);
             return;
         }
 
+        if (status === 'undetermined') {
+            // Need to request permission first
+            setRequestingPermission('gallery');
+            setShowPermissionModal(true);
+            return;
+        }
+
+        // Permission already granted, proceed with image picker
+        await launchImagePicker();
+    };
+
+    const launchImagePicker = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
@@ -64,6 +88,41 @@ export default function EditProfileScreen() {
         if (!result.canceled) {
             setProfileImage(result.assets[0].uri);
         }
+    };
+
+    const handlePermissionAllow = async () => {
+        if (!requestingPermission) return;
+
+        const granted = await requestPermission(requestingPermission);
+        setShowPermissionModal(false);
+
+        if (granted && requestingPermission === 'gallery') {
+            // Permission granted, launch image picker
+            await launchImagePicker();
+        } else {
+            // Permission denied again
+            showAlert(
+                'Permission Required',
+                'Gallery permission is needed to upload photos. You can enable it from your device settings.',
+                [{ text: 'OK' }]
+            );
+        }
+
+        setRequestingPermission(null);
+    };
+
+    const handlePermissionDeny = () => {
+        setShowPermissionModal(false);
+
+        if (requestingPermission === 'gallery') {
+            showAlert(
+                'Permission Required',
+                'Gallery permission is needed to upload photos. Tap the photo button again to grant permission.',
+                [{ text: 'OK' }]
+            );
+        }
+
+        setRequestingPermission(null);
     };
 
     useEffect(() => {
@@ -135,11 +194,11 @@ export default function EditProfileScreen() {
 
             await updateProfile(profileData);
 
-            Alert.alert('Success', 'Profile updated successfully!', [
+            showAlert('Success', 'Profile updated successfully!', [
                 { text: 'OK', onPress: () => navigation.goBack() }
             ]);
         } catch (error) {
-            Alert.alert('Error', 'Failed to save profile. Please try again.');
+            showAlert('Error', 'Failed to save profile. Please try again.');
         }
     };
 
@@ -357,6 +416,18 @@ export default function EditProfileScreen() {
                     <Text className="text-black font-bold text-lg">Save Changes</Text>
                 </TouchableOpacity>
             </ScrollView>
+
+            {/* Permission Modal */}
+            {requestingPermission && (
+                <PermissionModal
+                    visible={showPermissionModal}
+                    title={getPermissionConfig(requestingPermission).title}
+                    description={getPermissionConfig(requestingPermission).description}
+                    icon={getPermissionConfig(requestingPermission).icon}
+                    onAllow={handlePermissionAllow}
+                    onDeny={handlePermissionDeny}
+                />
+            )}
         </SafeAreaView>
     );
 }

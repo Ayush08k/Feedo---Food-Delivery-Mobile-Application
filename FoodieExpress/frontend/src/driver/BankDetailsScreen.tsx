@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useAlert } from '../utils/AlertContext';
 
 export default function BankDetailsScreen() {
     const navigation = useNavigation<any>();
+    const { showAlert } = useAlert();
     const [isEditing, setIsEditing] = useState(false);
 
     const [bankDetails, setBankDetails] = useState({
@@ -21,13 +23,13 @@ export default function BankDetailsScreen() {
 
     const handleSave = () => {
         if (!editedDetails.accountHolderName || !editedDetails.accountNumber || !editedDetails.ifscCode) {
-            Alert.alert('Error', 'Please fill all required fields');
+            showAlert('Error', 'Please fill all required fields');
             return;
         }
 
         setBankDetails(editedDetails);
         setIsEditing(false);
-        Alert.alert('Success', 'Bank details updated successfully!');
+        showAlert('Success', 'Bank details updated successfully!');
     };
 
     const handleCancel = () => {

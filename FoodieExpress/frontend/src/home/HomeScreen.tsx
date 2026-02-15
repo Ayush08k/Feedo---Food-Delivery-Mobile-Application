@@ -5,6 +5,9 @@ import { useNavigation } from '@react-navigation/native';
 import { getSuggestions } from '../utils/searchUtils';
 import { getSearchHistory, saveSearchQuery, clearSearchHistory } from '../utils/searchHistoryUtils';
 import { useUser } from '../utils/UserContext';
+import { usePermissions, PermissionType } from '../hooks/usePermissions';
+import PermissionModal from '../components/PermissionModal';
+import { clearPermissionFlags } from '../utils/clearPermissions';
 
 const CATEGORIES = [
     { id: 1, name: 'Biryani', icon: '🍛' },
@@ -62,12 +65,70 @@ export default function HomeScreen() {
     const slideAnim = useRef(new Animated.Value(0)).current;
     const opacityAnim = useRef(new Animated.Value(0)).current;
 
+    // Permission state
+    const [showPermissionModal, setShowPermissionModal] = useState(false);
+    const [requestingPermission, setRequestingPermission] = useState<PermissionType | null>(null);
+    const { requestPermission, checkInitialPermissionsShown, markInitialPermissionsShown, getPermissionConfig } = usePermissions();
+    const hasCheckedPermissions = useRef(false);
+
     const displayedCategories = showAllCategories ? CATEGORIES : CATEGORIES.slice(0, 7);
 
     // Load search history on mount
     useEffect(() => {
         loadSearchHistory();
     }, []);
+
+    // Check and show permissions on first load
+    useEffect(() => {
+        if (!hasCheckedPermissions.current) {
+            hasCheckedPermissions.current = true;
+            checkAndShowPermissions();
+        }
+    }, []);
+
+    const checkAndShowPermissions = async () => {
+        const shown = await checkInitialPermissionsShown();
+        if (!shown) {
+            // Show gallery permission first
+            setRequestingPermission('gallery');
+            setShowPermissionModal(true);
+        }
+    };
+
+    const handlePermissionAllow = async () => {
+        if (!requestingPermission) return;
+
+        await requestPermission(requestingPermission);
+        setShowPermissionModal(false);
+
+        // After gallery, show contacts
+        if (requestingPermission === 'gallery') {
+            setTimeout(() => {
+                setRequestingPermission('contacts');
+                setShowPermissionModal(true);
+            }, 500);
+        } else if (requestingPermission === 'contacts') {
+            // Both done, mark as shown
+            await markInitialPermissionsShown();
+            setRequestingPermission(null);
+        }
+    };
+
+    const handlePermissionDeny = async () => {
+        setShowPermissionModal(false);
+
+        // After gallery denial, show contacts
+        if (requestingPermission === 'gallery') {
+            setTimeout(() => {
+                setRequestingPermission('contacts');
+                setShowPermissionModal(true);
+            }, 500);
+        } else if (requestingPermission === 'contacts') {
+            // Both done (denied), mark as shown
+            await markInitialPermissionsShown();
+            setRequestingPermission(null);
+        }
+    };
 
     // Animate dropdown when showSuggestions changes
     useEffect(() => {
@@ -161,7 +222,10 @@ export default function HomeScreen() {
                             style={{ width: '30%', height: 44 }}
                             resizeMode="contain"
                         />
-                        <TouchableOpacity className="flex-row items-center bg-[#1E1E1E] px-3 py-2 rounded-full">
+                        <TouchableOpacity
+                            className="flex-row items-center bg-[#1E1E1E] px-3 py-2 rounded-full"
+                            onPress={() => (navigation as any).navigate('EditProfile', { role: 'user' })}
+                        >
                             <View className="w-8 h-8 rounded-full bg-[#1DB954] items-center justify-center mr-2 overflow-hidden">
                                 {profile?.profileImage ? (
                                     <Image source={{ uri: profile.profileImage }} className="w-full h-full" resizeMode="cover" />
@@ -431,6 +495,18 @@ export default function HomeScreen() {
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
+
+                {/* Permission Modal */}
+                {requestingPermission && (
+                    <PermissionModal
+                        visible={showPermissionModal}
+                        title={getPermissionConfig(requestingPermission).title}
+                        description={getPermissionConfig(requestingPermission).description}
+                        icon={getPermissionConfig(requestingPermission).icon}
+                        onAllow={handlePermissionAllow}
+                        onDeny={handlePermissionDeny}
+                    />
+                )}
             </SafeAreaView>
         </TouchableWithoutFeedback>
     );

@@ -3,6 +3,8 @@ import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useCart } from '../cart/CartContext';
+import { useAlert } from '../utils/AlertContext';
 
 // Mock orders data
 const MOCK_ORDERS = [
@@ -10,8 +12,14 @@ const MOCK_ORDERS = [
         id: '1',
         orderNumber: '#ORD-2024-001',
         restaurantName: 'Gourmet Burger Kitchen',
+        restaurantId: 1,
         restaurantImage: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80',
         items: ['Classic Burger', 'French Fries', 'Coke'],
+        detailedItems: [
+            { id: 101, name: 'Classic Burger', price: 12.99 },
+            { id: 102, name: 'French Fries', price: 4.99 },
+            { id: 103, name: 'Coke', price: 2.99 }
+        ],
         itemCount: 3,
         totalAmount: 24.99,
         status: 'delivered',
@@ -24,8 +32,13 @@ const MOCK_ORDERS = [
         id: '2',
         orderNumber: '#ORD-2024-002',
         restaurantName: 'Pizza Palace',
+        restaurantId: 3,
         restaurantImage: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400&q=80',
         items: ['Margherita Pizza', 'Garlic Bread'],
+        detailedItems: [
+            { id: 201, name: 'Margherita Pizza', price: 12.99 },
+            { id: 202, name: 'Garlic Bread', price: 5.51 }
+        ],
         itemCount: 2,
         totalAmount: 18.50,
         status: 'in-transit',
@@ -38,8 +51,14 @@ const MOCK_ORDERS = [
         id: '3',
         orderNumber: '#ORD-2024-003',
         restaurantName: 'Sushi Master',
+        restaurantId: 2,
         restaurantImage: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&q=80',
         items: ['California Roll', 'Tuna Sashimi', 'Miso Soup'],
+        detailedItems: [
+            { id: 301, name: 'California Roll', price: 15.99 },
+            { id: 302, name: 'Tuna Sashimi', price: 12.00 },
+            { id: 303, name: 'Miso Soup', price: 4.01 }
+        ],
         itemCount: 3,
         totalAmount: 32.00,
         status: 'delivered',
@@ -52,8 +71,14 @@ const MOCK_ORDERS = [
         id: '4',
         orderNumber: '#ORD-2024-004',
         restaurantName: 'The Breakfast Club',
+        restaurantId: 4,
         restaurantImage: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&q=80',
         items: ['Pancakes', 'Scrambled Eggs', 'Coffee'],
+        detailedItems: [
+            { id: 401, name: 'Pancakes', price: 8.99 },
+            { id: 402, name: 'Scrambled Eggs', price: 5.49 },
+            { id: 403, name: 'Coffee', price: 2.27 }
+        ],
         itemCount: 3,
         totalAmount: 16.75,
         status: 'cancelled',
@@ -66,11 +91,31 @@ const MOCK_ORDERS = [
 
 export default function YourOrdersScreen() {
     const navigation = useNavigation<any>();
+    const { addMultipleToCart } = useCart();
+    const { showAlert } = useAlert();
     const [filter, setFilter] = useState<'all' | 'delivered' | 'in-transit' | 'cancelled'>('all');
 
     const filteredOrders = filter === 'all'
         ? MOCK_ORDERS
         : MOCK_ORDERS.filter(order => order.status === filter);
+
+    const handleReorder = (order: any) => {
+        if (order.detailedItems && order.detailedItems.length > 0) {
+            addMultipleToCart(order.detailedItems, order.restaurantId);
+            showAlert(
+                'Added to Cart! 🛒',
+                `${order.itemCount} item(s) from ${order.restaurantName} have been added to your cart.`,
+                [
+                    { text: 'Continue Shopping', style: 'cancel' },
+                    { text: 'View Cart', onPress: () => navigation.navigate('Cart') }
+                ]
+            );
+        }
+    };
+
+    const handleRateOrder = (order: any) => {
+        navigation.navigate('RateOrder', { order });
+    };
 
     const getStatusConfig = (status: string) => {
         switch (status) {
@@ -269,10 +314,16 @@ export default function YourOrdersScreen() {
                                     <View className="flex-row gap-3">
                                         {order.status === 'delivered' && (
                                             <>
-                                                <TouchableOpacity className="flex-1 bg-[#1DB954] py-3 rounded-xl">
+                                                <TouchableOpacity
+                                                    className="flex-1 bg-[#1DB954] py-3 rounded-xl"
+                                                    onPress={() => handleReorder(order)}
+                                                >
                                                     <Text className="text-black text-center font-bold">Reorder</Text>
                                                 </TouchableOpacity>
-                                                <TouchableOpacity className="flex-1 bg-[#1E1E1E] py-3 rounded-xl border border-[#333]">
+                                                <TouchableOpacity
+                                                    className="flex-1 bg-[#1E1E1E] py-3 rounded-xl border border-[#333]"
+                                                    onPress={() => handleRateOrder(order)}
+                                                >
                                                     <Text className="text-white text-center font-bold">Rate Order</Text>
                                                 </TouchableOpacity>
                                             </>

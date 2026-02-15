@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useAlert } from '../utils/AlertContext';
 
 export default function NotificationsSettingsScreen() {
     const navigation = useNavigation<any>();
+    const { showAlert } = useAlert();
 
     const [orderUpdates, setOrderUpdates] = useState(true);
     const [promotions, setPromotions] = useState(true);
@@ -15,7 +17,7 @@ export default function NotificationsSettingsScreen() {
     const [pushNotifications, setPushNotifications] = useState(true);
 
     const handleSave = () => {
-        Alert.alert('Success', 'Notification preferences saved!');
+        showAlert('Success', 'Notification preferences saved!');
     };
 
     const renderToggle = (value: boolean, onToggle: () => void) => (

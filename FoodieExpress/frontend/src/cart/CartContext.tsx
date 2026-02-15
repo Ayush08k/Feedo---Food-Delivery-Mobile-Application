@@ -11,6 +11,7 @@ interface CartItem {
 interface CartContextType {
     items: CartItem[];
     addToCart: (item: any, restaurantId: number) => void;
+    addMultipleToCart: (items: any[], restaurantId: number) => void;
     removeFromCart: (itemId: number) => void;
     clearCart: () => void;
     total: number;
@@ -33,6 +34,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
         });
     };
 
+    const addMultipleToCart = (products: any[], restaurantId: number) => {
+        setItems((prev) => {
+            const newItems = [...prev];
+            products.forEach((product) => {
+                const existing = newItems.find((i) => i.id === product.id);
+                if (existing) {
+                    existing.quantity += product.quantity || 1;
+                } else {
+                    newItems.push({ ...product, quantity: product.quantity || 1, restaurantId });
+                }
+            });
+            return newItems;
+        });
+    };
+
     const removeFromCart = (itemId: number) => {
         setItems((prev) => prev.filter((i) => i.id !== itemId));
     };
@@ -42,7 +58,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     return (
-        <CartContext.Provider value={{ items, addToCart, removeFromCart, clearCart, total }}>
+        <CartContext.Provider value={{ items, addToCart, addMultipleToCart, removeFromCart, clearCart, total }}>
             {children}
         </CartContext.Provider>
     );

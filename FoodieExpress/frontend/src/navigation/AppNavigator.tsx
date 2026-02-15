@@ -12,8 +12,10 @@ import FoodItemDetailsScreen from '../menu/FoodItemDetailsScreen';
 import SearchResultsScreen from '../home/SearchResultsScreen';
 import YourOrdersScreen from '../profile/YourOrdersScreen';
 import ManageAddressesScreen from '../profile/ManageAddressesScreen';
+import AddAddressScreen from '../profile/AddAddressScreen';
 import PaymentMethodsScreen from '../profile/PaymentMethodsScreen';
 import NotificationsSettingsScreen from '../profile/NotificationsSettingsScreen';
+import RateOrderScreen from '../profile/RateOrderScreen';
 
 import DriverNavigator from '../driver/DriverNavigator';
 import RestaurantNavigator from '../restaurant-admin/RestaurantNavigator';
@@ -54,7 +56,9 @@ export default function AppNavigator() {
             <Stack.Screen name="SearchResults" component={SearchResultsScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="YourOrders" component={YourOrdersScreen} />
+            <Stack.Screen name="RateOrder" component={RateOrderScreen} />
             <Stack.Screen name="ManageAddresses" component={ManageAddressesScreen} />
+            <Stack.Screen name="AddAddress" component={AddAddressScreen} />
             <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
             <Stack.Screen name="NotificationsSettings" component={NotificationsSettingsScreen} />
 

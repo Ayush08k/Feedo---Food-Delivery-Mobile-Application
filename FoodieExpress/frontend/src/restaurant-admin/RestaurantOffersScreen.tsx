@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import OfferCard from '../utils/OfferCard';
+import { useAlert } from '../utils/AlertContext';
 
 interface Offer {
     id: number;
@@ -19,6 +20,7 @@ interface Offer {
 
 export default function RestaurantOffersScreen() {
     const navigation = useNavigation<any>();
+    const { showAlert } = useAlert();
     const [showCreateModal, setShowCreateModal] = useState(false);
 
     const [offers, setOffers] = useState<Offer[]>([
@@ -68,7 +70,7 @@ export default function RestaurantOffersScreen() {
     };
 
     const deleteOffer = (id: number) => {
-        Alert.alert(
+        showAlert(
             'Delete Offer',
             'Are you sure you want to delete this offer?',
             [

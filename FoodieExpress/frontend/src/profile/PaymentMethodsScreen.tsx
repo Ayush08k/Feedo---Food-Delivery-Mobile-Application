@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useAlert } from '../utils/AlertContext';
 
 interface PaymentMethod {
     id: string;
@@ -13,6 +14,7 @@ interface PaymentMethod {
 
 export default function PaymentMethodsScreen() {
     const navigation = useNavigation<any>();
+    const { showAlert } = useAlert();
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
         {
             id: '1',
@@ -51,11 +53,11 @@ export default function PaymentMethodsScreen() {
             ...method,
             isDefault: method.id === id
         })));
-        Alert.alert('Success', 'Default payment method updated!');
+        showAlert('Success', 'Default payment method updated!');
     };
 
     const handleDelete = (id: string) => {
-        Alert.alert(
+        showAlert(
             'Remove Payment Method',
             'Are you sure you want to remove this payment method?',
             [
@@ -72,7 +74,7 @@ export default function PaymentMethodsScreen() {
     };
 
     const handleAddNew = () => {
-        Alert.alert('Coming Soon', 'Add new payment method feature will be available soon!');
+        showAlert('Coming Soon', 'Add new payment method feature will be available soon!');
     };
 
     return (

@@ -1,14 +1,16 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { CommonActions } from '@react-navigation/native';
 import { useState, useEffect } from 'react';
 import { useUser } from '../utils/UserContext';
+import { useAlert } from '../utils/AlertContext';
 
 export default function ProfileScreen() {
     const navigation = useNavigation<any>();
     const { profile, refreshProfile } = useUser();
+    const { showAlert } = useAlert();
 
     useEffect(() => {
         // Reload profile when screen comes into focus
@@ -20,7 +22,7 @@ export default function ProfileScreen() {
     }, [navigation]);
 
     const handleLogout = () => {
-        Alert.alert(
+        showAlert(
             'Logout',
             'Are you sure you want to logout?',
             [
@@ -42,7 +44,7 @@ export default function ProfileScreen() {
     };
 
     const showComingSoon = (feature: string) => {
-        Alert.alert('Coming Soon', `${feature} feature will be available soon!`);
+        showAlert('Coming Soon', `${feature} feature will be available soon!`);
     };
 
     // Account Section
@@ -154,7 +156,7 @@ export default function ProfileScreen() {
 
                 {/* App Version */}
                 <View className="items-center py-6 mb-4">
-                    <Text className="text-[#666] text-xs">FoodieExpress</Text>
+                    <Text className="text-[#666] text-xs">Feedo</Text>
                     <Text className="text-[#666] text-xs mt-1">Version 1.0.0</Text>
                 </View>
             </ScrollView>

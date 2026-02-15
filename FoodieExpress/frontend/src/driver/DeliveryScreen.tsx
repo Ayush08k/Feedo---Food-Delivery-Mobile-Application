@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useAlert } from '../utils/AlertContext';
 
 export default function DeliveryScreen() {
     const navigation = useNavigation<any>();
+    const { showAlert } = useAlert();
     const [step, setStep] = useState(0); // 0: To Restaurant, 1: To Customer
 
     const handleAction = () => {
         if (step === 0) {
-            Alert.alert('Order Picked Up', 'Proceed to customer location.');
+            showAlert('Order Picked Up', 'Proceed to customer location.');
             setStep(1);
         } else {
-            Alert.alert('Delivered!', 'Good job. Earnings updated.');
+            showAlert('Delivered!', 'Good job. Earnings updated.');
             navigation.goBack();
         }
     };

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useAlert } from '../utils/AlertContext';
 
 interface Address {
     id: string;
@@ -17,6 +18,7 @@ interface Address {
 
 export default function ManageAddressesScreen() {
     const navigation = useNavigation<any>();
+    const { showAlert } = useAlert();
     const [addresses, setAddresses] = useState<Address[]>([
         {
             id: '1',
@@ -56,11 +58,11 @@ export default function ManageAddressesScreen() {
             ...addr,
             isDefault: addr.id === id
         })));
-        Alert.alert('Success', 'Default address updated!');
+        showAlert('Success', 'Default address updated!');
     };
 
     const handleDelete = (id: string) => {
-        Alert.alert(
+        showAlert(
             'Delete Address',
             'Are you sure you want to delete this address?',
             [
@@ -77,7 +79,11 @@ export default function ManageAddressesScreen() {
     };
 
     const handleAddNew = () => {
-        Alert.alert('Coming Soon', 'Add new address feature will be available soon!');
+        navigation.navigate('AddAddress', {
+            onAddAddress: (newAddress: Address) => {
+                setAddresses([...addresses, newAddress]);
+            }
+        });
     };
 
     return (
@@ -162,7 +168,7 @@ export default function ManageAddressesScreen() {
                                 )}
                                 <TouchableOpacity
                                     className="flex-1 bg-[#1E1E1E] py-2 rounded-lg mr-2 border border-[#333]"
-                                    onPress={() => Alert.alert('Coming Soon', 'Edit address feature will be available soon!')}
+                                    onPress={() => showAlert('Coming Soon', 'Edit address feature will be available soon!')}
                                 >
                                     <Text className="text-white text-center font-bold text-sm">Edit</Text>
                                 </TouchableOpacity>
