@@ -2,7 +2,9 @@ import React, { useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { filterFoodItems, filterRestaurants } from '../utils/searchUtils';
+import { useFavourites } from '../utils/FavouritesContext';
 
 // Mock data - same as HomeScreen
 const TOP_SELLERS = [
@@ -23,6 +25,15 @@ export default function SearchResultsScreen() {
     const navigation = useNavigation();
     const route = useRoute();
     const { query = '' } = route.params as { query: string };
+    const { addFavourite, removeFavourite, isFavourite } = useFavourites();
+
+    const toggleFavourite = (item: typeof TOP_SELLERS[0]) => {
+        if (isFavourite(item.id)) {
+            removeFavourite(item.id);
+        } else {
+            addFavourite({ id: item.id, name: item.name, price: item.price, restaurant: item.restaurant, image: item.image, category: item.category, rating: item.rating });
+        }
+    };
 
     // Filter results based on search query
     const filteredFoodItems = useMemo(() => filterFoodItems(TOP_SELLERS, query), [query]);
@@ -69,10 +80,23 @@ export default function SearchResultsScreen() {
                                         className="flex-row bg-[#1E1E1E] rounded-xl p-3 mb-3 border border-[#333]"
                                         onPress={() => (navigation as any).navigate('FoodItemDetails', { item })}
                                     >
-                                        <Image
-                                            source={{ uri: item.image }}
-                                            className="w-20 h-20 rounded-lg"
-                                        />
+                                        <View style={{ position: 'relative' }}>
+                                            <Image source={{ uri: item.image }} className="w-20 h-20 rounded-lg" />
+                                            <TouchableOpacity
+                                                onPress={(e) => { e.stopPropagation(); toggleFavourite(item); }}
+                                                style={{
+                                                    position: 'absolute', bottom: 4, right: 4,
+                                                    backgroundColor: 'rgba(18,18,18,0.75)',
+                                                    borderRadius: 14, padding: 4,
+                                                }}
+                                            >
+                                                <Ionicons
+                                                    name={isFavourite(item.id) ? 'heart' : 'heart-outline'}
+                                                    size={16}
+                                                    color={isFavourite(item.id) ? '#FF4D4D' : '#fff'}
+                                                />
+                                            </TouchableOpacity>
+                                        </View>
                                         <View className="flex-1 ml-3 justify-center">
                                             <Text className="text-white font-bold text-base mb-1">{item.name}</Text>
                                             <Text className="text-[#A0A0A0] text-sm mb-2">{item.restaurant}</Text>

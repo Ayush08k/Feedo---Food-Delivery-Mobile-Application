@@ -23,6 +23,7 @@ import DeliveryScreen from '../driver/DeliveryScreen';
 import EditProfileScreen from '../profile/EditProfileScreen';
 
 import RoleSelectionScreen from '../auth/RoleSelectionScreen';
+import FavouritesScreen from '../profile/FavouritesScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -61,6 +62,7 @@ export default function AppNavigator() {
             <Stack.Screen name="AddAddress" component={AddAddressScreen} />
             <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
             <Stack.Screen name="NotificationsSettings" component={NotificationsSettingsScreen} />
+            <Stack.Screen name="Favourites" component={FavouritesScreen} />
 
             {/* Driver App */}
             <Stack.Screen name="DriverApp" component={DriverNavigator} />

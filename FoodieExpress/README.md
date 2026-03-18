@@ -45,6 +45,11 @@ Feedo is a modern food delivery platform that connects customers with their favo
 - **Offers & Discounts** - Access special deals and promotional offers
   - Best offers screen with discount sorting
   - Offer details and redemption
+- **Favourite Foods** - Save and re-order your favourite food items
+  - Heart icon on every food card (Home, Search Results, Food Details)
+  - Favourites screen accessible from Profile
+  - One-tap re-order directly to cart
+  - Persists across app restarts via AsyncStorage
 
 ### 🍽️ For Restaurant Owners
 - **Restaurant Dashboard** - Comprehensive admin panel for restaurant management
@@ -132,6 +137,7 @@ FoodieExpress/
 │   │   │   ├── ProfileScreen.tsx
 │   │   │   ├── EditProfileScreen.tsx
 │   │   │   ├── YourOrdersScreen.tsx
+│   │   │   ├── FavouritesScreen.tsx
 │   │   │   ├── ManageAddressesScreen.tsx
 │   │   │   ├── PaymentMethodsScreen.tsx
 │   │   │   └── NotificationsSettingsScreen.tsx
@@ -140,6 +146,8 @@ FoodieExpress/
 │   │   ├── navigation/    # Navigation setup
 │   │   └── utils/         # Utility functions & context
 │   │       ├── UserContext.tsx
+│   │       ├── FavouritesContext.tsx
+│   │       ├── AlertContext.tsx
 │   │       ├── profileUtils.ts
 │   │       ├── searchUtils.ts
 │   │       └── CartContext.tsx
@@ -371,6 +379,7 @@ For complete API documentation, visit: `http://localhost:3000/api`
 - [x] Best offers section
 - [x] Global profile synchronization
 - [x] Restaurant sorting by ratings
+- [x] Favourite foods (save, re-order, and remove favourite items)
 
 ### 🚧 In Progress / Planned
 - [ ] Payment Gateway Integration (Stripe/Razorpay)
@@ -384,7 +393,6 @@ For complete API documentation, visit: `http://localhost:3000/api`
 - [ ] Social Sharing
 - [ ] Chat support with restaurants
 - [ ] Scheduled orders
-- [ ] Favorite restaurants and dishes
 
 ## 🤝 Contributing
 

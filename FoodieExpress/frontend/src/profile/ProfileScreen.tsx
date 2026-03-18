@@ -56,7 +56,7 @@ export default function ProfileScreen() {
     // Food Orders Section
     const orderItems = [
         { label: 'Your Orders', icon: '📦', onPress: () => navigation.navigate('YourOrders') },
-        { label: 'Favorite Orders', icon: '❤️', onPress: () => showComingSoon('Favorites') },
+        { label: 'Favorite Orders', icon: '❤️', onPress: () => navigation.navigate('Favourites') },
     ];
 
     // Payments & More Section

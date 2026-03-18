@@ -6,6 +6,7 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { CartProvider } from './src/cart/CartContext';
 import { UserProvider } from './src/utils/UserContext';
 import { AlertProvider } from './src/utils/AlertContext';
+import { FavouritesProvider } from './src/utils/FavouritesContext';
 import './global.css';
 
 const DarkTheme = {
@@ -30,9 +31,11 @@ export default function App() {
         <AlertProvider>
           <UserProvider>
             <CartProvider>
-              <NavigationContainer theme={DarkTheme}>
-                <AppNavigator />
-              </NavigationContainer>
+              <FavouritesProvider>
+                <NavigationContainer theme={DarkTheme}>
+                  <AppNavigator />
+                </NavigationContainer>
+              </FavouritesProvider>
             </CartProvider>
           </UserProvider>
         </AlertProvider>

@@ -2,12 +2,14 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { View, Text, ScrollView, TextInput, Image, TouchableOpacity, BackHandler, Keyboard, TouchableWithoutFeedback, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { getSuggestions } from '../utils/searchUtils';
 import { getSearchHistory, saveSearchQuery, clearSearchHistory } from '../utils/searchHistoryUtils';
 import { useUser } from '../utils/UserContext';
 import { usePermissions, PermissionType } from '../hooks/usePermissions';
 import PermissionModal from '../components/PermissionModal';
 import { clearPermissionFlags } from '../utils/clearPermissions';
+import { useFavourites } from '../utils/FavouritesContext';
 
 const CATEGORIES = [
     { id: 1, name: 'Biryani', icon: '🍛' },
@@ -55,6 +57,23 @@ const RESTAURANTS = [
 export default function HomeScreen() {
     const navigation = useNavigation();
     const { profile } = useUser();
+    const { addFavourite, removeFavourite, isFavourite } = useFavourites();
+
+    const toggleFavourite = (item: typeof TOP_SELLERS[0]) => {
+        if (isFavourite(item.id)) {
+            removeFavourite(item.id);
+        } else {
+            addFavourite({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                restaurant: item.restaurant,
+                image: item.image,
+                category: item.category,
+                rating: item.rating,
+            });
+        }
+    };
     const [showAllCategories, setShowAllCategories] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -410,7 +429,24 @@ export default function HomeScreen() {
                                     className="mr-4 bg-[#1E1E1E] rounded-2xl overflow-hidden border border-[#333] w-44"
                                     onPress={() => (navigation as any).navigate('FoodItemDetails', { item })}
                                 >
-                                    <Image source={{ uri: item.image }} className="w-full h-32" resizeMode="cover" />
+                                    <View style={{ position: 'relative' }}>
+                                        <Image source={{ uri: item.image }} className="w-full h-32" resizeMode="cover" />
+                                        {/* Heart / Favourite Toggle */}
+                                        <TouchableOpacity
+                                            onPress={(e) => { e.stopPropagation(); toggleFavourite(item); }}
+                                            style={{
+                                                position: 'absolute', top: 6, right: 6,
+                                                backgroundColor: 'rgba(18,18,18,0.75)',
+                                                borderRadius: 20, padding: 5,
+                                            }}
+                                        >
+                                            <Ionicons
+                                                name={isFavourite(item.id) ? 'heart' : 'heart-outline'}
+                                                size={18}
+                                                color={isFavourite(item.id) ? '#FF4D4D' : '#fff'}
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
                                     <View className="p-3">
                                         <Text className="text-white font-bold text-base mb-1">{item.name}</Text>
                                         <Text className="text-[#666] text-xs mb-2">{item.restaurant}</Text>

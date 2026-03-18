@@ -2,7 +2,9 @@ import React, { useState, useRef } from 'react';
 import { View, Text, ScrollView, Image, TouchableOpacity, TextInput, Dimensions, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../cart/CartContext';
+import { useFavourites } from '../utils/FavouritesContext';
 
 const { width } = Dimensions.get('window');
 
@@ -102,6 +104,23 @@ export default function FoodItemDetailsScreen() {
     const route = useRoute();
     const { item } = route.params as { item: FoodItem };
     const { items: cartItems, addToCart } = useCart();
+    const { addFavourite, removeFavourite, isFavourite } = useFavourites();
+
+    const toggleFavourite = () => {
+        if (isFavourite(item.id)) {
+            removeFavourite(item.id);
+        } else {
+            addFavourite({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                restaurant: item.restaurant,
+                image: item.image,
+                category: item.category,
+                rating: item.rating,
+            });
+        }
+    };
 
     const [quantity, setQuantity] = useState(1);
     const [selectedSize, setSelectedSize] = useState(SIZE_OPTIONS[0]);
@@ -235,10 +254,15 @@ export default function FoodItemDetailsScreen() {
                             </TouchableOpacity>
                             <View className="flex-row">
                                 <TouchableOpacity
+                                    onPress={toggleFavourite}
                                     className="w-12 h-12 bg-[#121212]/90 rounded-full items-center justify-center mr-3"
                                     style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4 }}
                                 >
-                                    <Text className="text-white text-2xl">🤍</Text>
+                                    <Ionicons
+                                        name={isFavourite(item.id) ? 'heart' : 'heart-outline'}
+                                        size={22}
+                                        color={isFavourite(item.id) ? '#FF4D4D' : '#fff'}
+                                    />
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     className="w-12 h-12 bg-[#121212]/90 rounded-full items-center justify-center"
