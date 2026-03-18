@@ -5,6 +5,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { filterFoodItems, filterRestaurants } from '../utils/searchUtils';
 import { useFavourites } from '../utils/FavouritesContext';
+import { useRestaurantStatus } from '../restaurant-admin/RestaurantStatusContext';
 
 // Mock data - same as HomeScreen
 const TOP_SELLERS = [
@@ -26,6 +27,7 @@ export default function SearchResultsScreen() {
     const route = useRoute();
     const { query = '' } = route.params as { query: string };
     const { addFavourite, removeFavourite, isFavourite } = useFavourites();
+    const { isOpen: isGlobalAppOpen } = useRestaurantStatus();
 
     const toggleFavourite = (item: typeof TOP_SELLERS[0]) => {
         if (isFavourite(item.id)) {
@@ -37,7 +39,10 @@ export default function SearchResultsScreen() {
 
     // Filter results based on search query
     const filteredFoodItems = useMemo(() => filterFoodItems(TOP_SELLERS, query), [query]);
-    const filteredRestaurants = useMemo(() => filterRestaurants(RESTAURANTS, query), [query]);
+    const filteredRestaurants = useMemo(() => {
+        const availableRestaurants = isGlobalAppOpen ? RESTAURANTS : [];
+        return filterRestaurants(availableRestaurants, query);
+    }, [query, isGlobalAppOpen]);
 
     const totalResults = filteredFoodItems.length + filteredRestaurants.length;
     const hasResults = totalResults > 0;

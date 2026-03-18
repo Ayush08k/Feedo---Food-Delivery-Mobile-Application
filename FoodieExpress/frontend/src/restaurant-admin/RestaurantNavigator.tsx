@@ -10,6 +10,7 @@ import RestaurantProfileScreen from './RestaurantProfileScreen';
 import EditProfileScreen from '../profile/EditProfileScreen';
 import OrderHistoryScreen from './OrderHistoryScreen';
 import OrderDetailsScreen from './OrderDetailsScreen';
+import { RestaurantStatusProvider } from './RestaurantStatusContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -57,6 +58,7 @@ function RestaurantTabNavigator() {
 
 export default function RestaurantNavigator() {
     return (
+        <RestaurantStatusProvider>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="RestaurantTabs" component={RestaurantTabNavigator} />
             <Stack.Screen name="MenuManagement" component={MenuManagementScreen} />
@@ -66,5 +68,6 @@ export default function RestaurantNavigator() {
             <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
             <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
         </Stack.Navigator>
+        </RestaurantStatusProvider>
     );
 }

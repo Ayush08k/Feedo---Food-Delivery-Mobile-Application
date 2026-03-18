@@ -11,6 +11,7 @@ import PermissionModal from '../components/PermissionModal';
 import { clearPermissionFlags } from '../utils/clearPermissions';
 import { useFavourites } from '../utils/FavouritesContext';
 import { useLanguage } from '../utils/LanguageContext';
+import { useRestaurantStatus } from '../restaurant-admin/RestaurantStatusContext';
 
 const CATEGORIES = [
     { id: 1, name: 'Biryani', icon: '🍛' },
@@ -60,6 +61,7 @@ export default function HomeScreen() {
     const { profile } = useUser();
     const { addFavourite, removeFavourite, isFavourite } = useFavourites();
     const { t } = useLanguage();
+    const { isOpen: restaurantAppGlobalStatus } = useRestaurantStatus();
 
     const toggleFavourite = (item: typeof TOP_SELLERS[0]) => {
         if (isFavourite(item.id)) {
@@ -473,7 +475,7 @@ export default function HomeScreen() {
                                 <Text className="text-[#1DB954]">{t('home.seeAll')}</Text>
                             </TouchableOpacity>
                         </View>
-                        {RESTAURANTS.slice(0, 2).map((rest) => (
+                        {RESTAURANTS.filter(r => restaurantAppGlobalStatus).slice(0, 2).map((rest) => (
                             <TouchableOpacity
                                 key={rest.id}
                                 className="mx-4 mb-4 bg-[#1E1E1E] rounded-2xl overflow-hidden border border-[#333]"
@@ -502,7 +504,7 @@ export default function HomeScreen() {
                     {/* Popular Restaurants */}
                     <View className="px-4 pb-6">
                         <Text className="text-white text-xl font-bold mb-4">{t('home.popularRestaurants')}</Text>
-                        {RESTAURANTS.map((rest) => (
+                        {RESTAURANTS.filter(r => restaurantAppGlobalStatus).map((rest) => (
                             <TouchableOpacity
                                 key={rest.id}
                                 className="mb-6 bg-[#1E1E1E] rounded-2xl overflow-hidden shadow-lg border border-[#333]"

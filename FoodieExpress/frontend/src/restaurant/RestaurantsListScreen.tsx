@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, Image, RefreshControl, Activi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { fetchAllRestaurants, Restaurant } from '../utils/restaurantApi';
+import { useRestaurantStatus } from '../restaurant-admin/RestaurantStatusContext';
 
 export default function RestaurantsListScreen() {
     const navigation = useNavigation<any>();
@@ -11,6 +12,7 @@ export default function RestaurantsListScreen() {
     const [refreshing, setRefreshing] = useState(false);
     const [sortOrder, setSortOrder] = useState<'high' | 'low'>('high');
     const [error, setError] = useState<string | null>(null);
+    const { isOpen: isGlobalAppOpen } = useRestaurantStatus();
 
     useEffect(() => {
         loadRestaurants();
@@ -82,7 +84,7 @@ export default function RestaurantsListScreen() {
             {/* Sort Controls */}
             <View className="px-4 py-3 bg-[#1E1E1E] border-b border-[#333] flex-row justify-between items-center">
                 <Text className="text-[#A0A0A0] text-sm">
-                    {restaurants.length} restaurant{restaurants.length !== 1 ? 's' : ''} found
+                    {isGlobalAppOpen ? restaurants.length : 0} restaurant{isGlobalAppOpen && restaurants.length !== 1 ? 's' : ''} found
                 </Text>
                 <TouchableOpacity
                     onPress={toggleSortOrder}
@@ -108,7 +110,7 @@ export default function RestaurantsListScreen() {
                     />
                 }
             >
-                {restaurants.length === 0 ? (
+                {!isGlobalAppOpen || restaurants.length === 0 ? (
                     <View className="flex-1 justify-center items-center py-20">
                         <Text className="text-[#A0A0A0] text-xl mb-2">🏪</Text>
                         <Text className="text-[#A0A0A0] text-lg">No restaurants available</Text>

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Dimensions, Switch, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import SearchBarComponent from '../utils/SearchBarComponent';
 import AnalyticsCard from '../utils/AnalyticsCard';
 import OfferCard from '../utils/OfferCard';
+import { Ionicons } from '@expo/vector-icons';
 import { getSearchHistory, saveSearchQuery, clearSearchHistory } from '../utils/searchHistoryUtils';
+import { useRestaurantStatus } from './RestaurantStatusContext';
 
 const { width } = Dimensions.get('window');
 
@@ -13,6 +15,21 @@ export default function RestaurantHomeScreen() {
     const navigation = useNavigation<any>();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
+    const { isOpen, setIsOpen } = useRestaurantStatus();
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    const handleToggleStatus = (newVal: boolean) => {
+        if (newVal === true) {
+            setShowConfirm(true); // Ask for confirmation when opening
+        } else {
+            setIsOpen(false); // Close instantly
+        }
+    };
+
+    const confirmOpen = () => {
+        setIsOpen(true);
+        setShowConfirm(false);
+    };
 
     useEffect(() => {
         loadSearchHistory();
@@ -53,16 +70,26 @@ export default function RestaurantHomeScreen() {
             {/* Header */}
             <View className="px-4 py-4 bg-[#121212] border-b border-[#333]">
                 <View className="flex-row justify-between items-center mb-2">
-                    <View>
+                    <View className="flex-1">
                         <Text className="text-white text-2xl font-bold">Restaurant Dashboard</Text>
-                        <Text className="text-[#1DB954]">● Open for Orders</Text>
+                        <Text className={isOpen ? "text-[#1DB954]" : "text-[#A0A0A0]"}>
+                            {isOpen ? '● Open for Orders' : '○ Closed'}
+                        </Text>
                     </View>
-                    <TouchableOpacity
-                        className="bg-[#1E1E1E] p-2 rounded-full"
-                        onPress={() => navigation.navigate('RestaurantProfile')}
-                    >
-                        <Text>⚙️</Text>
-                    </TouchableOpacity>
+                    <View className="flex-row items-center">
+                        <TouchableOpacity
+                            className="bg-[#1E1E1E] p-2 rounded-full mr-3"
+                            onPress={() => navigation.navigate('RestaurantProfile')}
+                        >
+                            <Text>⚙️</Text>
+                        </TouchableOpacity>
+                        <Switch
+                            trackColor={{ false: "#333", true: "#1DB954" }}
+                            thumbColor={isOpen ? "#fff" : "#f4f3f4"}
+                            onValueChange={handleToggleStatus}
+                            value={isOpen}
+                        />
+                    </View>
                 </View>
             </View>
 
@@ -222,6 +249,73 @@ export default function RestaurantHomeScreen() {
                     ))}
                 </View>
             </ScrollView>
+
+            {/* Confirmation Modal */}
+            <Modal
+                visible={showConfirm}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowConfirm(false)}
+            >
+                <View style={{
+                    flex: 1, backgroundColor: '#000000AA',
+                    alignItems: 'center', justifyContent: 'center', padding: 24,
+                }}>
+                    <View style={{
+                        backgroundColor: '#1E1E1E', borderRadius: 20,
+                        padding: 28, width: '100%',
+                        borderWidth: 1, borderColor: '#333',
+                    }}>
+                        {/* Icon */}
+                        <View style={{ alignItems: 'center', marginBottom: 20 }}>
+                            <View style={{
+                                width: 72, height: 72, borderRadius: 36,
+                                backgroundColor: '#1DB95420', alignItems: 'center', justifyContent: 'center',
+                                borderWidth: 2, borderColor: '#1DB95455', marginBottom: 12,
+                            }}>
+                                <Ionicons name="storefront" size={36} color="#1DB954" />
+                            </View>
+                            <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold', textAlign: 'center' }}>
+                                Open Restaurant?
+                            </Text>
+                        </View>
+
+                        <Text style={{
+                            color: '#A0A0A0', fontSize: 15, textAlign: 'center',
+                            lineHeight: 22, marginBottom: 28,
+                        }}>
+                            Are you sure you want to open the restaurant? Customers will immediately be able to see your menu and place orders.
+                        </Text>
+
+                        {/* Buttons */}
+                        <TouchableOpacity
+                            onPress={confirmOpen}
+                            style={{
+                                backgroundColor: '#1DB954',
+                                paddingVertical: 14, borderRadius: 12,
+                                alignItems: 'center', marginBottom: 12,
+                            }}
+                        >
+                            <Text style={{ color: '#000', fontWeight: 'bold', fontSize: 16 }}>
+                                ✓ Yes, Open Now
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            onPress={() => setShowConfirm(false)}
+                            style={{
+                                backgroundColor: '#2A2A2A',
+                                paddingVertical: 14, borderRadius: 12,
+                                alignItems: 'center', borderWidth: 1, borderColor: '#444',
+                            }}
+                        >
+                            <Text style={{ color: '#A0A0A0', fontWeight: 'bold', fontSize: 16 }}>
+                                Cancel
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 }
