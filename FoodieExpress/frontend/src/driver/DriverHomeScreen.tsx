@@ -3,12 +3,13 @@ import { View, Text, ScrollView, TouchableOpacity, Switch, Dimensions } from 're
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import AnalyticsCard from '../utils/AnalyticsCard';
+import { useDriverStatus } from './DriverStatusContext';
 
 const { width } = Dimensions.get('window');
 
 export default function DriverHomeScreen() {
     const navigation = useNavigation<any>();
-    const [isOnline, setIsOnline] = useState(false);
+    const { isOnline, setIsOnline } = useDriverStatus();
 
     const todayStats = {
         earnings: 87.50,
@@ -49,7 +50,7 @@ export default function DriverHomeScreen() {
                         <Switch
                             trackColor={{ false: "#333", true: "#1DB954" }}
                             thumbColor={isOnline ? "#fff" : "#f4f3f4"}
-                            onValueChange={() => setIsOnline(!isOnline)}
+                            onValueChange={(val) => setIsOnline(val)}
                             value={isOnline}
                         />
                     </View>

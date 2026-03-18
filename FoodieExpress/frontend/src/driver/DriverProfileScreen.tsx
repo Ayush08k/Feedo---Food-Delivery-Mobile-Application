@@ -1,151 +1,210 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, CommonActions } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { loadProfileData } from '../utils/profileUtils';
+import { useLanguage } from '../utils/LanguageContext';
 
 export default function DriverProfileScreen() {
     const navigation = useNavigation<any>();
     const [profileData, setProfileData] = useState<any>(null);
+    const { currentLangMeta } = useLanguage();
 
     useEffect(() => {
         const loadProfile = async () => {
             const data = await loadProfileData();
-            if (data) {
-                setProfileData(data);
-            }
+            if (data) setProfileData(data);
         };
         loadProfile();
-
-        const unsubscribe = navigation.addListener('focus', () => {
-            loadProfile();
-        });
-
+        const unsubscribe = navigation.addListener('focus', loadProfile);
         return unsubscribe;
     }, [navigation]);
 
     const handleLogout = () => {
         navigation.dispatch(
-            CommonActions.reset({
-                index: 0,
-                routes: [{ name: 'Auth' }],
-            })
+            CommonActions.reset({ index: 0, routes: [{ name: 'Auth' }] })
         );
     };
 
-    const menuItems = [
-        { label: 'Edit Profile', icon: '👤', onPress: () => navigation.navigate('EditProfile', { role: 'driver' }) },
+    const accountItems = [
+        { label: 'Edit Profile',    icon: '👤', onPress: () => navigation.navigate('EditProfile', { role: 'driver' }) },
         { label: 'Vehicle Details', icon: '🚗', onPress: () => navigation.navigate('VehicleDetails') },
-        { label: 'Documents', icon: '📄', onPress: () => navigation.navigate('Documents') },
-        { label: 'Earnings Report', icon: '💰', onPress: () => navigation.navigate('EarningsReport') },
-        { label: 'Bank Details', icon: '🏦', onPress: () => navigation.navigate('BankDetails') },
-        { label: 'Help & Support', icon: '❓', onPress: () => { } },
-        { label: 'Settings', icon: '⚙️', onPress: () => { } },
+        { label: 'Documents',       icon: '📄', onPress: () => navigation.navigate('Documents') },
     ];
 
-    return (
-        <SafeAreaView className="flex-1 bg-[#121212]">
-            {/* Header */}
-            <View className="px-4 py-4 bg-[#121212] border-b border-[#333]">
-                <View className="flex-row items-center">
+    const earningsItems = [
+        { label: 'Earnings Report', icon: '💰', onPress: () => navigation.navigate('EarningsReport') },
+        { label: 'Bank Details',    icon: '🏦', onPress: () => navigation.navigate('BankDetails') },
+    ];
+
+    const appItems = [
+        {
+            label: 'Settings', icon: '⚙️',
+            onPress: () => navigation.navigate('DriverSettings'),
+        },
+        {
+            label: 'Language', icon: currentLangMeta.flag,
+            badge: currentLangMeta.nativeName,
+            onPress: () => navigation.navigate('DriverLanguage'),
+        },
+        {
+            label: 'Send Feedback', icon: '📝',
+            onPress: () => navigation.navigate('DriverFeedback'),
+        },
+    ];
+
+    const renderSection = (title: string, items: any[]) => (
+        <View style={{ marginBottom: 20 }}>
+            <Text style={{
+                color: '#A0A0A0', fontSize: 11, fontWeight: 'bold',
+                textTransform: 'uppercase', letterSpacing: 1,
+                marginBottom: 8, marginLeft: 4,
+            }}>
+                {title}
+            </Text>
+            <View style={{
+                backgroundColor: '#1E1E1E', borderRadius: 16,
+                overflow: 'hidden', borderWidth: 1, borderColor: '#333',
+            }}>
+                {items.map((item, index) => (
                     <TouchableOpacity
-                        onPress={() => navigation.goBack()}
-                        className="mr-4 p-2 rounded-full bg-[#1E1E1E]"
+                        key={item.label}
+                        onPress={item.onPress}
+                        style={{
+                            flexDirection: 'row', alignItems: 'center',
+                            padding: 16,
+                            borderBottomWidth: index !== items.length - 1 ? 1 : 0,
+                            borderBottomColor: '#333',
+                        }}
                     >
-                        <Text className="text-white">←</Text>
+                        <View style={{
+                            width: 40, height: 40, borderRadius: 12,
+                            backgroundColor: '#121212', alignItems: 'center',
+                            justifyContent: 'center', marginRight: 12,
+                        }}>
+                            <Text style={{ fontSize: 20 }}>{item.icon}</Text>
+                        </View>
+                        <Text style={{ color: '#fff', fontSize: 15, flex: 1 }}>{item.label}</Text>
+                        {item.badge && (
+                            <Text style={{ color: '#A0A0A0', fontSize: 12, marginRight: 8 }}>{item.badge}</Text>
+                        )}
+                        <Ionicons name="chevron-forward" size={18} color="#555" />
                     </TouchableOpacity>
-                    <Text className="text-white text-2xl font-bold">Driver Profile</Text>
-                </View>
+                ))}
+            </View>
+        </View>
+    );
+
+    return (
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#121212' }}>
+            {/* Header */}
+            <View style={{
+                paddingHorizontal: 16, paddingVertical: 16,
+                borderBottomWidth: 1, borderBottomColor: '#333',
+            }}>
+                <Text style={{ color: '#fff', fontSize: 24, fontWeight: 'bold' }}>Driver Profile</Text>
             </View>
 
-            <ScrollView className="flex-1">
+            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                 {/* Profile Header */}
-                <View className="p-6 items-center border-b border-[#333]">
-                    <View className="w-24 h-24 bg-[#1E1E1E] rounded-full items-center justify-center border-2 border-[#1DB954] mb-4">
-                        <Text className="text-4xl">🚗</Text>
+                <View style={{ padding: 24, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#333' }}>
+                    <View style={{
+                        width: 90, height: 90, borderRadius: 45,
+                        backgroundColor: '#1E1E1E', alignItems: 'center', justifyContent: 'center',
+                        borderWidth: 2, borderColor: '#1DB954', marginBottom: 12,
+                    }}>
+                        <Text style={{ fontSize: 40 }}>🚗</Text>
                     </View>
-                    <Text className="text-white text-2xl font-bold">{profileData?.name || 'Driver Name'}</Text>
-                    <Text className="text-[#A0A0A0]">{profileData?.email || 'driver@example.com'}</Text>
-                    <View className="flex-row mt-4 space-x-4">
-                        <View className="items-center px-4 border-r border-[#333]">
-                            <Text className="text-white font-bold text-xl">245</Text>
-                            <Text className="text-[#A0A0A0] text-xs">Deliveries</Text>
+                    <Text style={{ color: '#fff', fontSize: 22, fontWeight: 'bold' }}>
+                        {profileData?.name || 'Driver Name'}
+                    </Text>
+                    <Text style={{ color: '#A0A0A0' }}>{profileData?.email || 'driver@example.com'}</Text>
+
+                    <View style={{ flexDirection: 'row', marginTop: 16 }}>
+                        <View style={{ alignItems: 'center', paddingHorizontal: 20, borderRightWidth: 1, borderRightColor: '#333' }}>
+                            <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 20 }}>245</Text>
+                            <Text style={{ color: '#A0A0A0', fontSize: 12 }}>Deliveries</Text>
                         </View>
-                        <View className="items-center px-4 border-r border-[#333]">
-                            <Text className="text-white font-bold text-xl">4.9</Text>
-                            <Text className="text-[#A0A0A0] text-xs">Rating</Text>
+                        <View style={{ alignItems: 'center', paddingHorizontal: 20, borderRightWidth: 1, borderRightColor: '#333' }}>
+                            <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 20 }}>4.9</Text>
+                            <Text style={{ color: '#A0A0A0', fontSize: 12 }}>Rating</Text>
                         </View>
-                        <View className="items-center px-4">
-                            <Text className="text-white font-bold text-xl">96%</Text>
-                            <Text className="text-[#A0A0A0] text-xs">On-Time</Text>
+                        <View style={{ alignItems: 'center', paddingHorizontal: 20 }}>
+                            <Text style={{ color: '#1DB954', fontWeight: 'bold', fontSize: 20 }}>96%</Text>
+                            <Text style={{ color: '#A0A0A0', fontSize: 12 }}>On-Time</Text>
                         </View>
                     </View>
                 </View>
 
                 {/* Vehicle Info */}
-                <View className="px-4 pt-6 pb-4">
-                    <Text className="text-[#A0A0A0] uppercase text-xs font-bold mb-4 ml-2">Vehicle Information</Text>
-                    <View className="bg-[#1E1E1E] p-4 rounded-2xl border border-[#333]">
-                        <View className="flex-row justify-between mb-3">
-                            <Text className="text-[#A0A0A0]">Vehicle Type</Text>
-                            <Text className="text-white font-semibold">Motorcycle</Text>
-                        </View>
-                        <View className="flex-row justify-between mb-3">
-                            <Text className="text-[#A0A0A0]">License Plate</Text>
-                            <Text className="text-white font-semibold">ABC-1234</Text>
-                        </View>
-                        <View className="flex-row justify-between">
-                            <Text className="text-[#A0A0A0]">Insurance</Text>
-                            <Text className="text-[#1DB954] font-semibold">✓ Valid</Text>
-                        </View>
-                    </View>
-                </View>
-
-                {/* Earnings Summary */}
-                <View className="px-4 pb-4">
-                    <Text className="text-[#A0A0A0] uppercase text-xs font-bold mb-4 ml-2">Earnings Summary</Text>
-                    <View className="bg-[#1E1E1E] p-4 rounded-2xl border border-[#333]">
-                        <View className="flex-row justify-between mb-3">
-                            <Text className="text-[#A0A0A0]">This Week</Text>
-                            <Text className="text-[#1DB954] font-bold text-lg">$342.50</Text>
-                        </View>
-                        <View className="flex-row justify-between mb-3">
-                            <Text className="text-[#A0A0A0]">This Month</Text>
-                            <Text className="text-white font-semibold">$1,287.00</Text>
-                        </View>
-                        <View className="flex-row justify-between">
-                            <Text className="text-[#A0A0A0]">Total Earnings</Text>
-                            <Text className="text-white font-semibold">$8,540.00</Text>
-                        </View>
-                    </View>
-                </View>
-
-                {/* Menu Items */}
-                <View className="px-4 pb-6">
-                    <Text className="text-[#A0A0A0] uppercase text-xs font-bold mb-4 ml-2">Account</Text>
-                    <View className="bg-[#1E1E1E] rounded-2xl overflow-hidden mb-6">
-                        {menuItems.map((item, index) => (
-                            <TouchableOpacity
-                                key={item.label}
-                                className={`flex-row items-center p-4 ${index !== menuItems.length - 1 ? 'border-b border-[#333]' : ''}`}
-                                onPress={item.onPress}
-                            >
-                                <Text className="mr-4 text-xl">{item.icon}</Text>
-                                <Text className="text-white text-lg flex-1">{item.label}</Text>
-                                <Text className="text-[#666] text-xl">›</Text>
-                            </TouchableOpacity>
+                <View style={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 4 }}>
+                    <Text style={{
+                        color: '#A0A0A0', fontSize: 11, fontWeight: 'bold',
+                        textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, marginLeft: 4,
+                    }}>
+                        Vehicle Information
+                    </Text>
+                    <View style={{
+                        backgroundColor: '#1E1E1E', borderRadius: 16,
+                        borderWidth: 1, borderColor: '#333', padding: 16, marginBottom: 20,
+                    }}>
+                        {[
+                            { label: 'Vehicle Type', value: 'Motorcycle' },
+                            { label: 'License Plate', value: 'ABC-1234' },
+                            { label: 'Insurance',     value: '✓ Valid', green: true },
+                        ].map(r => (
+                            <View key={r.label} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
+                                <Text style={{ color: '#A0A0A0' }}>{r.label}</Text>
+                                <Text style={{ color: r.green ? '#1DB954' : '#fff', fontWeight: '500' }}>{r.value}</Text>
+                            </View>
                         ))}
                     </View>
-                </View>
 
-                {/* Logout Button */}
-                <View className="px-4 pb-10">
+                    {/* Earnings Summary */}
+                    <Text style={{
+                        color: '#A0A0A0', fontSize: 11, fontWeight: 'bold',
+                        textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, marginLeft: 4,
+                    }}>
+                        Earnings Summary
+                    </Text>
+                    <View style={{
+                        backgroundColor: '#1E1E1E', borderRadius: 16,
+                        borderWidth: 1, borderColor: '#333', padding: 16, marginBottom: 20,
+                    }}>
+                        {[
+                            { label: 'This Week',     value: '$342.50',   green: true },
+                            { label: 'This Month',    value: '$1,287.00', green: false },
+                            { label: 'Total Earnings',value: '$8,540.00', green: false },
+                        ].map(r => (
+                            <View key={r.label} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
+                                <Text style={{ color: '#A0A0A0' }}>{r.label}</Text>
+                                <Text style={{ color: r.green ? '#1DB954' : '#fff', fontWeight: 'bold' }}>{r.value}</Text>
+                            </View>
+                        ))}
+                    </View>
+
+                    {/* Sections */}
+                    {renderSection('Account', accountItems)}
+                    {renderSection('Earnings', earningsItems)}
+                    {renderSection('App', appItems)}
+
+                    {/* Logout */}
                     <TouchableOpacity
                         onPress={handleLogout}
-                        className="flex-row items-center justify-center bg-[#1E1E1E] p-4 rounded-xl border border-red-900/30"
+                        style={{
+                            flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+                            backgroundColor: '#1E1E1E', padding: 16, borderRadius: 14,
+                            borderWidth: 1, borderColor: '#7F1D1D44', marginBottom: 8,
+                        }}
                     >
-                        <Text className="text-red-500 font-bold text-lg">Log Out</Text>
+                        <Text style={{ fontSize: 20, marginRight: 8 }}>🚪</Text>
+                        <Text style={{ color: '#EF4444', fontWeight: 'bold', fontSize: 16 }}>Log Out</Text>
                     </TouchableOpacity>
+
+                    <View style={{ alignItems: 'center', paddingVertical: 16 }}>
+                        <Text style={{ color: '#444', fontSize: 12 }}>Feedo – Driver App v1.0.0</Text>
+                    </View>
                 </View>
             </ScrollView>
         </SafeAreaView>

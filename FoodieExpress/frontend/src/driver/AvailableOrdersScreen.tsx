@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import SearchBarComponent from '../utils/SearchBarComponent';
+import { useDriverStatus } from './DriverStatusContext';
 
 interface Order {
     id: number;
@@ -20,6 +22,8 @@ export default function AvailableOrdersScreen() {
     const navigation = useNavigation<any>();
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState<'distance' | 'fee' | 'time'>('distance');
+    const [showConfirm, setShowConfirm] = useState(false);
+    const { isOnline, setIsOnline } = useDriverStatus();
 
     const [orders, setOrders] = useState<Order[]>([
         {
@@ -85,6 +89,141 @@ export default function AvailableOrdersScreen() {
     const acceptOrder = (orderId: number) => {
         navigation.navigate('DriverDelivery', { orderId });
     };
+
+    const handleGoOnline = () => {
+        setIsOnline(true);
+        setShowConfirm(false);
+    };
+
+    // ── Offline Guard ──────────────────────────────────────────────────────────
+    if (!isOnline) {
+        return (
+            <SafeAreaView style={{ flex: 1, backgroundColor: '#121212' }}>
+                {/* Header */}
+                <View style={{
+                    paddingHorizontal: 16, paddingVertical: 16,
+                    borderBottomWidth: 1, borderBottomColor: '#333',
+                }}>
+                    <Text style={{ color: '#fff', fontSize: 22, fontWeight: 'bold' }}>Available Orders</Text>
+                </View>
+
+                {/* Offline message */}
+                <View style={{
+                    flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28,
+                }}>
+                    <View style={{
+                        width: 110, height: 110, borderRadius: 55,
+                        backgroundColor: '#1E1E1E', alignItems: 'center', justifyContent: 'center',
+                        marginBottom: 24, borderWidth: 2, borderColor: '#FF4D4D44',
+                    }}>
+                        <Text style={{ fontSize: 52 }}>😴</Text>
+                    </View>
+
+                    <Text style={{
+                        color: '#fff', fontSize: 22, fontWeight: 'bold',
+                        marginBottom: 10, textAlign: 'center',
+                    }}>
+                        You're Offline
+                    </Text>
+                    <Text style={{
+                        color: '#A0A0A0', fontSize: 15, textAlign: 'center',
+                        lineHeight: 22, marginBottom: 32,
+                    }}>
+                        You need to go online first to see and accept available delivery orders.
+                    </Text>
+
+                    {/* Activate button */}
+                    <TouchableOpacity
+                        onPress={() => setShowConfirm(true)}
+                        style={{
+                            backgroundColor: '#1DB954',
+                            paddingHorizontal: 36, paddingVertical: 16,
+                            borderRadius: 14, flexDirection: 'row',
+                            alignItems: 'center',
+                            shadowColor: '#1DB954', shadowOffset: { width: 0, height: 4 },
+                            shadowOpacity: 0.4, shadowRadius: 12, elevation: 8,
+                        }}
+                    >
+                        <Ionicons name="power" size={20} color="#000" style={{ marginRight: 8 }} />
+                        <Text style={{ color: '#000', fontWeight: 'bold', fontSize: 17 }}>
+                            Go Online
+                        </Text>
+                    </TouchableOpacity>
+
+                    <Text style={{ color: '#555', fontSize: 12, marginTop: 16 }}>
+                        You can also toggle online from the Dashboard
+                    </Text>
+                </View>
+
+                {/* Confirmation Modal */}
+                <Modal
+                    visible={showConfirm}
+                    transparent
+                    animationType="fade"
+                    onRequestClose={() => setShowConfirm(false)}
+                >
+                    <View style={{
+                        flex: 1, backgroundColor: '#000000AA',
+                        alignItems: 'center', justifyContent: 'center', padding: 24,
+                    }}>
+                        <View style={{
+                            backgroundColor: '#1E1E1E', borderRadius: 20,
+                            padding: 28, width: '100%',
+                            borderWidth: 1, borderColor: '#333',
+                        }}>
+                            {/* Icon */}
+                            <View style={{ alignItems: 'center', marginBottom: 20 }}>
+                                <View style={{
+                                    width: 72, height: 72, borderRadius: 36,
+                                    backgroundColor: '#1DB95420', alignItems: 'center', justifyContent: 'center',
+                                    borderWidth: 2, borderColor: '#1DB95455', marginBottom: 12,
+                                }}>
+                                    <Ionicons name="power" size={36} color="#1DB954" />
+                                </View>
+                                <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold' }}>
+                                    Go Online?
+                                </Text>
+                            </View>
+
+                            <Text style={{
+                                color: '#A0A0A0', fontSize: 15, textAlign: 'center',
+                                lineHeight: 22, marginBottom: 28,
+                            }}>
+                                Are you sure you want to come online? You'll start receiving delivery requests immediately.
+                            </Text>
+
+                            {/* Buttons */}
+                            <TouchableOpacity
+                                onPress={handleGoOnline}
+                                style={{
+                                    backgroundColor: '#1DB954',
+                                    paddingVertical: 14, borderRadius: 12,
+                                    alignItems: 'center', marginBottom: 12,
+                                }}
+                            >
+                                <Text style={{ color: '#000', fontWeight: 'bold', fontSize: 16 }}>
+                                    ✓ Yes, Go Online
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={() => setShowConfirm(false)}
+                                style={{
+                                    backgroundColor: '#2A2A2A',
+                                    paddingVertical: 14, borderRadius: 12,
+                                    alignItems: 'center', borderWidth: 1, borderColor: '#444',
+                                }}
+                            >
+                                <Text style={{ color: '#A0A0A0', fontWeight: 'bold', fontSize: 16 }}>
+                                    Cancel
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView className="flex-1 bg-[#121212]">

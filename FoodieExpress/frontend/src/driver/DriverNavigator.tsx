@@ -13,6 +13,10 @@ import VehicleDetailsScreen from './VehicleDetailsScreen';
 import DocumentsScreen from './DocumentsScreen';
 import EarningsReportScreen from './EarningsReportScreen';
 import BankDetailsScreen from './BankDetailsScreen';
+import DriverSettingsScreen from './DriverSettingsScreen';
+import DriverLanguageScreen from './DriverLanguageScreen';
+import FeedbackScreen from '../profile/FeedbackScreen';
+import { DriverStatusProvider } from './DriverStatusContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -60,6 +64,7 @@ function DriverTabNavigator() {
 
 export default function DriverNavigator() {
     return (
+        <DriverStatusProvider>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="DriverTabs" component={DriverTabNavigator} />
             <Stack.Screen name="AvailableOrders" component={AvailableOrdersScreen} />
@@ -71,6 +76,10 @@ export default function DriverNavigator() {
             <Stack.Screen name="Documents" component={DocumentsScreen} />
             <Stack.Screen name="EarningsReport" component={EarningsReportScreen} />
             <Stack.Screen name="BankDetails" component={BankDetailsScreen} />
+            <Stack.Screen name="DriverSettings" component={DriverSettingsScreen} />
+            <Stack.Screen name="DriverLanguage" component={DriverLanguageScreen} />
+            <Stack.Screen name="DriverFeedback" component={FeedbackScreen} />
         </Stack.Navigator>
+        </DriverStatusProvider>
     );
 }
