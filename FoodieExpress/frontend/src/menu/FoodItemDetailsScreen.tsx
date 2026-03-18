@@ -5,6 +5,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../cart/CartContext';
 import { useFavourites } from '../utils/FavouritesContext';
+import { useLanguage } from '../utils/LanguageContext';
 
 const { width } = Dimensions.get('window');
 
@@ -105,6 +106,7 @@ export default function FoodItemDetailsScreen() {
     const { item } = route.params as { item: FoodItem };
     const { items: cartItems, addToCart } = useCart();
     const { addFavourite, removeFavourite, isFavourite } = useFavourites();
+    const { t } = useLanguage();
 
     const toggleFavourite = () => {
         if (isFavourite(item.id)) {
@@ -306,7 +308,7 @@ export default function FoodItemDetailsScreen() {
 
                 {/* Size Selection */}
                 <View className="px-4 py-4 bg-[#1E1E1E] mt-2">
-                    <Text className="text-white text-lg font-bold mb-3">Choose Size</Text>
+                    <Text className="text-white text-lg font-bold mb-3">{t('food.chooseSize')}</Text>
                     <View className="flex-row">
                         {SIZE_OPTIONS.map((size) => (
                             <TouchableOpacity
@@ -333,7 +335,7 @@ export default function FoodItemDetailsScreen() {
 
                 {/* Add-ons */}
                 <View className="px-4 py-4 bg-[#1E1E1E] mt-2">
-                    <Text className="text-white text-lg font-bold mb-3">Add-ons</Text>
+                    <Text className="text-white text-lg font-bold mb-3">{t('food.addons')}</Text>
                     {ADDON_OPTIONS.map((addon) => (
                         <TouchableOpacity
                             key={addon.id}
@@ -358,11 +360,11 @@ export default function FoodItemDetailsScreen() {
 
                 {/* Special Instructions */}
                 <View className="px-4 py-4 bg-[#1E1E1E] mt-2">
-                    <Text className="text-white text-lg font-bold mb-3">Special Instructions</Text>
+                    <Text className="text-white text-lg font-bold mb-3">{t('food.specialInstructions')}</Text>
                     <TextInput
                         value={specialInstructions}
                         onChangeText={setSpecialInstructions}
-                        placeholder="E.g., No onions, extra sauce..."
+                        placeholder={t('food.specialInstructionsPlaceholder')}
                         placeholderTextColor="#666"
                         multiline
                         numberOfLines={3}
@@ -373,7 +375,7 @@ export default function FoodItemDetailsScreen() {
 
                 {/* Reviews Section */}
                 <View className="px-4 py-4 bg-[#1E1E1E] mt-2">
-                    <Text className="text-white text-xl font-bold mb-4">Reviews & Ratings</Text>
+                    <Text className="text-white text-xl font-bold mb-4">{t('food.reviews')}</Text>
 
                     {/* Overall Rating */}
                     <View className="flex-row mb-4">
@@ -440,7 +442,7 @@ export default function FoodItemDetailsScreen() {
 
                 {/* Similar Items */}
                 <View className="py-4 bg-[#1E1E1E] mt-2">
-                    <Text className="text-white text-xl font-bold px-4 mb-4">Similar Items</Text>
+                    <Text className="text-white text-xl font-bold px-4 mb-4">{t('food.similarItems')}</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
                         {SIMILAR_ITEMS.map((similarItem) => (
                             <TouchableOpacity
@@ -471,7 +473,7 @@ export default function FoodItemDetailsScreen() {
 
                 {/* Similar Restaurants */}
                 <View className="py-4 bg-[#1E1E1E] mt-2 mb-24">
-                    <Text className="text-white text-xl font-bold px-4 mb-4">Similar Restaurants</Text>
+                    <Text className="text-white text-xl font-bold px-4 mb-4">{t('food.similarRestaurants')}</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
                         {SIMILAR_RESTAURANTS.map((restaurant) => (
                             <TouchableOpacity
@@ -534,7 +536,7 @@ export default function FoodItemDetailsScreen() {
                                 onPress={handleAddToCart}
                             >
                                 <Text className="text-white font-bold text-base">
-                                    {isAdded ? '✓ Added to Cart!' : `ADD ${quantity} • $${totalPrice.toFixed(2)}`}
+                                    {isAdded ? t('food.addedToCart') : `ADD ${quantity} • $${totalPrice.toFixed(2)}`}
                                 </Text>
                             </TouchableOpacity>
                         </Animated.View>
@@ -544,7 +546,7 @@ export default function FoodItemDetailsScreen() {
                             className="bg-[#FFD93D] rounded-lg py-2 items-center justify-center relative"
                             onPress={() => (navigation as any).navigate('Checkout')}
                         >
-                            <Text className="text-[#121212] font-bold text-base">CHECKOUT</Text>
+                            <Text className="text-[#121212] font-bold text-base">{t('food.checkout')}</Text>
                             {cartItems.length > 0 && (
                                 <View className="absolute -top-2 -right-2 bg-[#121212] rounded-full w-5 h-5 flex items-center justify-center">
                                     <Text className="text-white text-xs font-bold">

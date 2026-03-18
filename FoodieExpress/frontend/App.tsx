@@ -7,6 +7,7 @@ import { CartProvider } from './src/cart/CartContext';
 import { UserProvider } from './src/utils/UserContext';
 import { AlertProvider } from './src/utils/AlertContext';
 import { FavouritesProvider } from './src/utils/FavouritesContext';
+import { LanguageProvider } from './src/utils/LanguageContext';
 import './global.css';
 
 const DarkTheme = {
@@ -28,17 +29,19 @@ export default function App() {
     <View style={{ flex: 1, backgroundColor: '#121212' }}>
       <StatusBar barStyle="light-content" backgroundColor="#121212" />
       <SafeAreaProvider>
-        <AlertProvider>
-          <UserProvider>
-            <CartProvider>
-              <FavouritesProvider>
-                <NavigationContainer theme={DarkTheme}>
-                  <AppNavigator />
-                </NavigationContainer>
-              </FavouritesProvider>
-            </CartProvider>
-          </UserProvider>
-        </AlertProvider>
+        <LanguageProvider>
+          <AlertProvider>
+            <UserProvider>
+              <CartProvider>
+                <FavouritesProvider>
+                  <NavigationContainer theme={DarkTheme}>
+                    <AppNavigator />
+                  </NavigationContainer>
+                </FavouritesProvider>
+              </CartProvider>
+            </UserProvider>
+          </AlertProvider>
+        </LanguageProvider>
       </SafeAreaProvider>
     </View>
   );

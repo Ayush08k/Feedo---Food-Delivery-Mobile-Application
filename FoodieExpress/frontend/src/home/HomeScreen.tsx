@@ -10,6 +10,7 @@ import { usePermissions, PermissionType } from '../hooks/usePermissions';
 import PermissionModal from '../components/PermissionModal';
 import { clearPermissionFlags } from '../utils/clearPermissions';
 import { useFavourites } from '../utils/FavouritesContext';
+import { useLanguage } from '../utils/LanguageContext';
 
 const CATEGORIES = [
     { id: 1, name: 'Biryani', icon: '🍛' },
@@ -58,6 +59,7 @@ export default function HomeScreen() {
     const navigation = useNavigation();
     const { profile } = useUser();
     const { addFavourite, removeFavourite, isFavourite } = useFavourites();
+    const { t } = useLanguage();
 
     const toggleFavourite = (item: typeof TOP_SELLERS[0]) => {
         if (isFavourite(item.id)) {
@@ -256,8 +258,8 @@ export default function HomeScreen() {
                         </TouchableOpacity>
                     </View>
                     <View className="absolute left-0 right-0 items-center" style={{ top: 13, marginLeft: 40 }}>
-                        <Text className="text-[#A0A0A0] text-sm uppercase">Deliver to</Text>
-                        <Text className="text-[#1DB954] font-bold text-lg">Current Location 📍</Text>
+                        <Text className="text-[#A0A0A0] text-sm uppercase">{t('app.deliverTo')}</Text>
+                        <Text className="text-[#1DB954] font-bold text-lg">{t('app.currentLocation')}</Text>
                     </View>
                 </View>
 
@@ -274,7 +276,7 @@ export default function HomeScreen() {
                         <Text className="mr-2">🔍</Text>
                         <TextInput
                             ref={searchInputRef}
-                            placeholder="Search for food or restaurants..."
+                            placeholder={t('app.searchPlaceholder')}
                             placeholderTextColor="#666"
                             className="flex-1 text-white"
                             value={searchQuery}
@@ -348,9 +350,9 @@ export default function HomeScreen() {
                                 // Show recent searches when not typing
                                 <>
                                     <View className="flex-row items-center justify-between p-3 border-b border-[#333]">
-                                        <Text className="text-[#A0A0A0] text-sm font-semibold">Recent Searches</Text>
+                                        <Text className="text-[#A0A0A0] text-sm font-semibold">{t('app.recentSearches')}</Text>
                                         <TouchableOpacity onPress={handleClearHistory}>
-                                            <Text className="text-[#FF6B6B] text-xs">Clear All</Text>
+                                            <Text className="text-[#FF6B6B] text-xs">{t('app.clearAll')}</Text>
                                         </TouchableOpacity>
                                     </View>
                                     {searchHistory.map((historyItem, index) => (
@@ -377,7 +379,7 @@ export default function HomeScreen() {
                 <ScrollView showsVerticalScrollIndicator={false}>
                     {/* Offers Banner */}
                     <View className="mb-6">
-                        <Text className="text-white text-xl font-bold px-4 mb-4">Offers For You</Text>
+                        <Text className="text-white text-xl font-bold px-4 mb-4">{t('home.offersForYou')}</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
                             {OFFERS.map((offer) => (
                                 <TouchableOpacity
@@ -395,7 +397,7 @@ export default function HomeScreen() {
 
                     {/* Categories */}
                     <View className="mb-6">
-                        <Text className="text-white text-xl font-bold px-4 mb-4">Categories</Text>
+                        <Text className="text-white text-xl font-bold px-4 mb-4">{t('home.categories')}</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
                             {displayedCategories.map((cat) => (
                                 <TouchableOpacity key={cat.id} className="mr-4 items-center">
@@ -413,7 +415,7 @@ export default function HomeScreen() {
                                     <View className="w-16 h-16 bg-[#1E1E1E] rounded-full items-center justify-center mb-2 border border-[#1DB954]">
                                         <Text className="text-2xl">⋯</Text>
                                     </View>
-                                    <Text className="text-[#1DB954] text-sm font-bold">Show More</Text>
+                                    <Text className="text-[#1DB954] text-sm font-bold">{t('home.showMore')}</Text>
                                 </TouchableOpacity>
                             )}
                         </ScrollView>
@@ -421,7 +423,7 @@ export default function HomeScreen() {
 
                     {/* Top Sellers */}
                     <View className="mb-6">
-                        <Text className="text-white text-xl font-bold px-4 mb-4">Top Sellers</Text>
+                        <Text className="text-white text-xl font-bold px-4 mb-4">{t('home.topSellers')}</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
                             {TOP_SELLERS.map((item) => (
                                 <TouchableOpacity
@@ -466,9 +468,9 @@ export default function HomeScreen() {
                     {/* Best Offers */}
                     <View className="mb-6">
                         <View className="flex-row justify-between items-center px-4 mb-4">
-                            <Text className="text-white text-xl font-bold">Best Offers</Text>
+                            <Text className="text-white text-xl font-bold">{t('home.bestOffers')}</Text>
                             <TouchableOpacity onPress={() => (navigation as any).navigate('BestOffers')}>
-                                <Text className="text-[#1DB954]">See All →</Text>
+                                <Text className="text-[#1DB954]">{t('home.seeAll')}</Text>
                             </TouchableOpacity>
                         </View>
                         {RESTAURANTS.slice(0, 2).map((rest) => (
@@ -491,7 +493,7 @@ export default function HomeScreen() {
                                             <Text className="text-white text-xs">{rest.rating}</Text>
                                         </View>
                                     </View>
-                                    <Text className="text-[#A0A0A0] text-sm">🕒 {rest.time} • Free Delivery</Text>
+                                    <Text className="text-[#A0A0A0] text-sm">🕒 {rest.time} • {t('home.freeDelivery')}</Text>
                                 </View>
                             </TouchableOpacity>
                         ))}
@@ -499,7 +501,7 @@ export default function HomeScreen() {
 
                     {/* Popular Restaurants */}
                     <View className="px-4 pb-6">
-                        <Text className="text-white text-xl font-bold mb-4">Popular Restaurants</Text>
+                        <Text className="text-white text-xl font-bold mb-4">{t('home.popularRestaurants')}</Text>
                         {RESTAURANTS.map((rest) => (
                             <TouchableOpacity
                                 key={rest.id}
@@ -515,7 +517,7 @@ export default function HomeScreen() {
                                             <Text className="text-white text-xs">{rest.rating}</Text>
                                         </View>
                                     </View>
-                                    <Text className="text-[#A0A0A0] text-sm">🕒 {rest.time} • Free Delivery</Text>
+                                    <Text className="text-[#A0A0A0] text-sm">🕒 {rest.time} • {t('home.freeDelivery')}</Text>
                                 </View>
                             </TouchableOpacity>
                         ))}
@@ -527,7 +529,7 @@ export default function HomeScreen() {
                             className="bg-[#1DB954] py-4 rounded-xl items-center shadow-lg shadow-green-900/50"
                             onPress={() => (navigation as any).navigate('RestaurantsList')}
                         >
-                            <Text className="text-black font-bold text-lg">🏪 Browse All Restaurants</Text>
+                            <Text className="text-black font-bold text-lg">{t('home.browseAll')}</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>

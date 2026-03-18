@@ -6,29 +6,29 @@ import { CommonActions } from '@react-navigation/native';
 import { useState, useEffect } from 'react';
 import { useUser } from '../utils/UserContext';
 import { useAlert } from '../utils/AlertContext';
+import { useLanguage } from '../utils/LanguageContext';
 
 export default function ProfileScreen() {
     const navigation = useNavigation<any>();
     const { profile, refreshProfile } = useUser();
     const { showAlert } = useAlert();
+    const { t, currentLangMeta } = useLanguage();
 
     useEffect(() => {
-        // Reload profile when screen comes into focus
         const unsubscribe = navigation.addListener('focus', () => {
             refreshProfile();
         });
-
         return unsubscribe;
     }, [navigation]);
 
     const handleLogout = () => {
         showAlert(
-            'Logout',
+            t('profile.logout'),
             'Are you sure you want to logout?',
             [
                 { text: 'Cancel', style: 'cancel' },
                 {
-                    text: 'Logout',
+                    text: t('profile.logout'),
                     style: 'destructive',
                     onPress: () => {
                         navigation.dispatch(
@@ -47,37 +47,33 @@ export default function ProfileScreen() {
         showAlert('Coming Soon', `${feature} feature will be available soon!`);
     };
 
-    // Account Section
     const accountItems = [
-        { label: 'Edit Profile', icon: '👤', onPress: () => navigation.navigate('EditProfile', { role: 'user' }) },
-        { label: 'Manage Addresses', icon: '📍', onPress: () => navigation.navigate('ManageAddresses') },
+        { label: t('profile.editProfile'),      icon: '👤', onPress: () => navigation.navigate('EditProfile', { role: 'user' }) },
+        { label: t('profile.manageAddresses'),  icon: '📍', onPress: () => navigation.navigate('ManageAddresses') },
     ];
 
-    // Food Orders Section
     const orderItems = [
-        { label: 'Your Orders', icon: '📦', onPress: () => navigation.navigate('YourOrders') },
-        { label: 'Favorite Orders', icon: '❤️', onPress: () => navigation.navigate('Favourites') },
+        { label: t('profile.yourOrders'),       icon: '📦', onPress: () => navigation.navigate('YourOrders') },
+        { label: t('profile.favouriteOrders'),  icon: '❤️', onPress: () => navigation.navigate('Favourites') },
     ];
 
-    // Payments & More Section
     const paymentItems = [
-        { label: 'Payment Methods', icon: '💳', onPress: () => navigation.navigate('PaymentMethods') },
-        { label: 'Refund Status', icon: '💰', onPress: () => showComingSoon('Refunds') },
+        { label: t('profile.paymentMethods'),   icon: '💳', onPress: () => navigation.navigate('PaymentMethods') },
     ];
 
-    // Settings Section
     const settingsItems = [
-        { label: 'Notifications', icon: '🔔', onPress: () => navigation.navigate('NotificationsSettings') },
-        { label: 'Language', icon: '🌐', onPress: () => showComingSoon('Language Settings') },
+        { label: t('profile.notifications'),    icon: '🔔', onPress: () => navigation.navigate('NotificationsSettings') },
+        {
+            label: t('profile.language'),
+            icon: currentLangMeta.flag,
+            onPress: () => navigation.navigate('Language'),
+            badge: currentLangMeta.nativeName,
+        },
     ];
 
-    // More Info Section
     const moreItems = [
-        { label: 'About', icon: 'ℹ️', onPress: () => showComingSoon('About') },
-        { label: 'Send Feedback', icon: '📝', onPress: () => showComingSoon('Feedback') },
-        { label: 'Help & Support', icon: '❓', onPress: () => showComingSoon('Help') },
-        { label: 'Terms of Service', icon: '📄', onPress: () => showComingSoon('Terms') },
-        { label: 'Privacy Policy', icon: '🔒', onPress: () => showComingSoon('Privacy') },
+        { label: t('profile.about'),    icon: 'ℹ️', onPress: () => navigation.navigate('About') },
+        { label: t('profile.feedback'), icon: '📝', onPress: () => navigation.navigate('Feedback') },
     ];
 
     const renderMenuSection = (title: string, items: any[]) => (
@@ -94,6 +90,9 @@ export default function ProfileScreen() {
                             <Text className="text-xl">{item.icon}</Text>
                         </View>
                         <Text className="text-white text-base flex-1">{item.label}</Text>
+                        {item.badge && (
+                            <Text className="text-[#A0A0A0] text-sm mr-2">{item.badge}</Text>
+                        )}
                         <Text className="text-[#666] text-xl">›</Text>
                     </TouchableOpacity>
                 ))}
@@ -120,41 +119,31 @@ export default function ProfileScreen() {
                 <View className="flex-row mt-4 space-x-4">
                     <View className="items-center px-4 border-r border-[#333]">
                         <Text className="text-white font-bold text-xl">12</Text>
-                        <Text className="text-[#A0A0A0] text-xs">Orders</Text>
+                        <Text className="text-[#A0A0A0] text-xs">{t('profile.orders')}</Text>
                     </View>
                     <View className="items-center px-4">
                         <Text className="text-white font-bold text-xl">4.8</Text>
-                        <Text className="text-[#A0A0A0] text-xs">Rating</Text>
+                        <Text className="text-[#A0A0A0] text-xs">{t('profile.rating')}</Text>
                     </View>
                 </View>
             </View>
 
             <ScrollView className="flex-1 px-4 pt-6" showsVerticalScrollIndicator={false}>
-                {/* Account Section */}
-                {renderMenuSection('Account', accountItems)}
+                {renderMenuSection(t('profile.account'),    accountItems)}
+                {renderMenuSection(t('profile.foodOrders'), orderItems)}
+                {renderMenuSection(t('profile.payments'),   paymentItems)}
+                {renderMenuSection(t('profile.settings'),   settingsItems)}
+                {renderMenuSection(t('profile.moreInfo'),   moreItems)}
 
-                {/* Food Orders Section */}
-                {renderMenuSection('Food Orders', orderItems)}
-
-                {/* Payments Section */}
-                {renderMenuSection('Payments', paymentItems)}
-
-                {/* Settings Section */}
-                {renderMenuSection('Settings', settingsItems)}
-
-                {/* More Info Section */}
-                {renderMenuSection('More Info', moreItems)}
-
-                {/* Logout Button */}
+                {/* Logout */}
                 <TouchableOpacity
                     onPress={handleLogout}
                     className="flex-row items-center justify-center bg-[#1E1E1E] p-4 rounded-xl border border-red-900/30 mb-4"
                 >
                     <Text className="text-xl mr-2">🚪</Text>
-                    <Text className="text-red-500 font-bold text-lg">Log Out</Text>
+                    <Text className="text-red-500 font-bold text-lg">{t('profile.logout')}</Text>
                 </TouchableOpacity>
 
-                {/* App Version */}
                 <View className="items-center py-6 mb-4">
                     <Text className="text-[#666] text-xs">Feedo</Text>
                     <Text className="text-[#666] text-xs mt-1">Version 1.0.0</Text>
