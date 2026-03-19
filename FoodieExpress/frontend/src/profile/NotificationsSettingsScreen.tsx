@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useAlert } from '../utils/AlertContext';
+import { useUser } from '../utils/UserContext';
+import axios from 'axios';
+
+const API_BASE_URL = 'http://192.168.1.4:3000';
 
 export default function NotificationsSettingsScreen() {
     const navigation = useNavigation<any>();
     const { showAlert } = useAlert();
+    const { profile } = useUser();
+    const [loading, setLoading] = useState(true);
 
     const [orderUpdates, setOrderUpdates] = useState(true);
     const [promotions, setPromotions] = useState(true);
@@ -16,8 +22,55 @@ export default function NotificationsSettingsScreen() {
     const [smsNotifications, setSmsNotifications] = useState(true);
     const [pushNotifications, setPushNotifications] = useState(true);
 
-    const handleSave = () => {
-        showAlert('Success', 'Notification preferences saved!');
+    useEffect(() => {
+        const fetchPreferences = async () => {
+            if (!profile?.email) {
+                setLoading(false);
+                return;
+            }
+            try {
+                const response = await axios.get(`${API_BASE_URL}/users/preferences?email=${profile.email}`);
+                const prefs = response.data;
+                if (prefs) {
+                    if (prefs.orderUpdates !== undefined) setOrderUpdates(prefs.orderUpdates);
+                    if (prefs.promotions !== undefined) setPromotions(prefs.promotions);
+                    if (prefs.newRestaurants !== undefined) setNewRestaurants(prefs.newRestaurants);
+                    if (prefs.orderReminders !== undefined) setOrderReminders(prefs.orderReminders);
+                    if (prefs.emailNotifications !== undefined) setEmailNotifications(prefs.emailNotifications);
+                    if (prefs.smsNotifications !== undefined) setSmsNotifications(prefs.smsNotifications);
+                    if (prefs.pushNotifications !== undefined) setPushNotifications(prefs.pushNotifications);
+                }
+            } catch (error) {
+                console.error('Error fetching preferences', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPreferences();
+    }, [profile]);
+
+    const handleSave = async () => {
+        if (!profile?.email) return;
+
+        try {
+            await axios.put(`${API_BASE_URL}/users/preferences`, {
+                email: profile.email,
+                preferences: {
+                    orderUpdates,
+                    promotions,
+                    newRestaurants,
+                    orderReminders,
+                    emailNotifications,
+                    smsNotifications,
+                    pushNotifications,
+                }
+            });
+            showAlert('Success', 'Notification preferences saved!');
+        } catch (error) {
+            console.error('Error saving preferences', error);
+            showAlert('Error', 'Failed to save preferences.');
+        }
     };
 
     const renderToggle = (value: boolean, onToggle: () => void) => (
@@ -65,7 +118,12 @@ export default function NotificationsSettingsScreen() {
                 </TouchableOpacity>
             </View>
 
-            <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
+            {loading ? (
+                <View className="flex-1 justify-center items-center">
+                    <ActivityIndicator size="large" color="#1DB954" />
+                </View>
+            ) : (
+                <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
                 {/* Order Notifications */}
                 <Text className="text-[#A0A0A0] uppercase text-xs font-bold mb-3 ml-2">
                     Order Notifications
@@ -147,6 +205,7 @@ export default function NotificationsSettingsScreen() {
 
                 <View className="h-20" />
             </ScrollView>
+            )}
         </SafeAreaView>
     );
 }

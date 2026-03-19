@@ -28,4 +28,18 @@ export class UsersService {
             .select('-passwordHash')
             .exec();
     }
+
+    async updateNotificationPreferences(userId: string, preferences: Record<string, boolean>): Promise<Record<string, boolean>> {
+        const user = await this.userModel.findByIdAndUpdate(
+            userId,
+            { $set: { notificationPreferences: preferences } },
+            { new: true }
+        ).exec();
+        return user?.notificationPreferences || {};
+    }
+
+    async getNotificationPreferences(userId: string): Promise<Record<string, boolean>> {
+        const user = await this.userModel.findById(userId).exec();
+        return user?.notificationPreferences || {};
+    }
 }

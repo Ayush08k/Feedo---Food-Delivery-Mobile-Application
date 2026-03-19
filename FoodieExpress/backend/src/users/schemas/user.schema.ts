@@ -53,6 +53,9 @@ export class User {
 
     @Prop({ default: true })
     isAvailable?: boolean;
+
+    @Prop({ type: Object, default: {} })
+    notificationPreferences?: Record<string, boolean>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

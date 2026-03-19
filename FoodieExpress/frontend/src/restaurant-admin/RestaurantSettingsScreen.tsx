@@ -11,7 +11,7 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://192.168.1.4:3000';
 
-export default function DriverSettingsScreen() {
+export default function RestaurantSettingsScreen() {
     const navigation = useNavigation<any>();
     const { profile } = useUser();
     const { showAlert } = useAlert();
@@ -19,14 +19,11 @@ export default function DriverSettingsScreen() {
 
     // Toggle states
     const [pushNotifications, setPushNotifications] = useState(true);
-    const [orderAlerts, setOrderAlerts] = useState(true);
+    const [newOrderAlerts, setNewOrderAlerts] = useState(true);
+    const [cancellationAlerts, setCancellationAlerts] = useState(true);
     const [earningsUpdates, setEarningsUpdates] = useState(true);
-    const [locationTracking, setLocationTracking] = useState(true);
     const [soundEnabled, setSoundEnabled] = useState(true);
-    const [vibrationEnabled, setVibrationEnabled] = useState(true);
     const [darkMode, setDarkMode] = useState(true);
-    const [autoAccept, setAutoAccept] = useState(false);
-    const [showEarnings, setShowEarnings] = useState(true);
 
     useEffect(() => {
         const fetchPreferences = async () => {
@@ -39,13 +36,13 @@ export default function DriverSettingsScreen() {
                 const prefs = response.data;
                 if (prefs) {
                     if (prefs.pushNotifications !== undefined) setPushNotifications(prefs.pushNotifications);
-                    if (prefs.orderAlerts !== undefined) setOrderAlerts(prefs.orderAlerts);
+                    if (prefs.newOrderAlerts !== undefined) setNewOrderAlerts(prefs.newOrderAlerts);
+                    if (prefs.cancellationAlerts !== undefined) setCancellationAlerts(prefs.cancellationAlerts);
                     if (prefs.earningsUpdates !== undefined) setEarningsUpdates(prefs.earningsUpdates);
                     if (prefs.soundEnabled !== undefined) setSoundEnabled(prefs.soundEnabled);
-                    if (prefs.vibrationEnabled !== undefined) setVibrationEnabled(prefs.vibrationEnabled);
                 }
             } catch (error) {
-                console.error('Error fetching driver preferences', error);
+                console.error('Error fetching restaurant preferences', error);
             } finally {
                 setLoading(false);
             }
@@ -62,15 +59,15 @@ export default function DriverSettingsScreen() {
                 email: profile.email,
                 preferences: {
                     pushNotifications,
-                    orderAlerts,
+                    newOrderAlerts,
+                    cancellationAlerts,
                     earningsUpdates,
-                    soundEnabled,
-                    vibrationEnabled
+                    soundEnabled
                 }
             });
-            showAlert('Success', 'Settings saved!');
+            showAlert('Success', 'Restaurant settings saved!');
         } catch (error) {
-            console.error('Error saving driver preferences', error);
+            console.error('Error saving restaurant preferences', error);
             showAlert('Error', 'Failed to save settings.');
         }
     };
@@ -147,7 +144,7 @@ export default function DriverSettingsScreen() {
                     </TouchableOpacity>
                     <View>
                         <Text style={{ color: '#fff', fontSize: 22, fontWeight: 'bold' }}>Settings</Text>
-                        <Text style={{ color: '#A0A0A0', fontSize: 13 }}>App preferences</Text>
+                        <Text style={{ color: '#A0A0A0', fontSize: 13 }}>Preferences & Notifications</Text>
                     </View>
                 </View>
                 <TouchableOpacity onPress={handleSave}>
@@ -162,98 +159,47 @@ export default function DriverSettingsScreen() {
             ) : (
                 <ScrollView contentContainerStyle={{ padding: 16 }} showsVerticalScrollIndicator={false}>
 
-                <Section title="Notifications">
-                    <SettingToggle
-                        icon="🔔" label="Push Notifications"
-                        sublabel="Receive all app notifications"
-                        value={pushNotifications} onValueChange={setPushNotifications}
-                    />
-                    <SettingToggle
-                        icon="📦" label="New Order Alerts"
-                        sublabel="Alert when a new order is available"
-                        value={orderAlerts} onValueChange={setOrderAlerts}
-                    />
-                    <SettingToggle
-                        icon="💰" label="Earnings Updates"
-                        sublabel="Notify on payment received"
-                        value={earningsUpdates} onValueChange={setEarningsUpdates}
-                    />
-                </Section>
+                    <Section title="Order Notifications">
+                        <SettingToggle
+                            icon="🔔" label="Push Notifications"
+                            sublabel="Receive all restaurant notifications"
+                            value={pushNotifications} onValueChange={setPushNotifications}
+                        />
+                        <SettingToggle
+                            icon="📦" label="New Order Alerts"
+                            sublabel="Alert when a customer places an order"
+                            value={newOrderAlerts} onValueChange={setNewOrderAlerts}
+                        />
+                        <SettingToggle
+                            icon="❌" label="Cancellation Alerts"
+                            sublabel="Notify when an order is cancelled"
+                            value={cancellationAlerts} onValueChange={setCancellationAlerts}
+                        />
+                    </Section>
 
-                <Section title="Sound & Haptics">
-                    <SettingToggle
-                        icon="🔊" label="Sound Effects"
-                        sublabel="Play sounds for alerts"
-                        value={soundEnabled} onValueChange={setSoundEnabled}
-                    />
-                    <SettingToggle
-                        icon="📳" label="Vibration"
-                        sublabel="Vibrate on alerts"
-                        value={vibrationEnabled} onValueChange={setVibrationEnabled}
-                    />
-                </Section>
+                    <Section title="Business Updates">
+                        <SettingToggle
+                            icon="💰" label="Earnings Updates"
+                            sublabel="Get daily/weekly earnings reports"
+                            value={earningsUpdates} onValueChange={setEarningsUpdates}
+                        />
+                    </Section>
 
-                <Section title="Navigation & Tracking">
-                    <SettingToggle
-                        icon="📍" label="Location Tracking"
-                        sublabel="Required for delivery tracking"
-                        value={locationTracking} onValueChange={setLocationTracking}
-                    />
-                    <SettingToggle
-                        icon="⚡" label="Auto-Accept Orders"
-                        sublabel="Automatically accept matching orders"
-                        value={autoAccept} onValueChange={setAutoAccept}
-                    />
-                </Section>
+                    <Section title="App Settings">
+                        <SettingToggle
+                            icon="🔊" label="Sound Effects"
+                            sublabel="Play loud sound on new orders"
+                            value={soundEnabled} onValueChange={setSoundEnabled}
+                        />
+                        <SettingToggle
+                            icon="🌙" label="Dark Mode"
+                            sublabel="App dark theme (recommended)"
+                            value={darkMode} onValueChange={setDarkMode}
+                        />
+                    </Section>
 
-                <Section title="Display">
-                    <SettingToggle
-                        icon="🌙" label="Dark Mode"
-                        sublabel="App dark theme (recommended)"
-                        value={darkMode} onValueChange={setDarkMode}
-                    />
-                    <SettingToggle
-                        icon="💵" label="Show Earnings on Home"
-                        sublabel="Display earnings summary on dashboard"
-                        value={showEarnings} onValueChange={setShowEarnings}
-                    />
-                </Section>
-
-                {/* Language shortcut */}
-                <View style={{ marginBottom: 20 }}>
-                    <Text style={{
-                        color: '#A0A0A0', fontSize: 11, fontWeight: 'bold',
-                        textTransform: 'uppercase', letterSpacing: 1,
-                        paddingHorizontal: 16, marginBottom: 8,
-                    }}>
-                        Language
-                    </Text>
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('DriverLanguage')}
-                        style={{
-                            backgroundColor: '#1E1E1E', borderRadius: 16,
-                            borderWidth: 1, borderColor: '#333',
-                            flexDirection: 'row', alignItems: 'center',
-                            paddingHorizontal: 16, paddingVertical: 14,
-                        }}
-                    >
-                        <View style={{
-                            width: 40, height: 40, borderRadius: 12,
-                            backgroundColor: '#121212', alignItems: 'center',
-                            justifyContent: 'center', marginRight: 12,
-                        }}>
-                            <Text style={{ fontSize: 20 }}>🌐</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <Text style={{ color: '#fff', fontSize: 15, fontWeight: '500' }}>App Language</Text>
-                            <Text style={{ color: '#666', fontSize: 12, marginTop: 1 }}>Select your preferred language</Text>
-                        </View>
-                        <Ionicons name="chevron-forward" size={18} color="#666" />
-                    </TouchableOpacity>
-                </View>
-
-                <View style={{ height: 20 }} />
-            </ScrollView>
+                    <View style={{ height: 20 }} />
+                </ScrollView>
             )}
         </SafeAreaView>
     );

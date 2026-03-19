@@ -38,9 +38,9 @@ export default function RestaurantProfileScreen() {
         { label: 'Business Hours', icon: '🕒', onPress: () => { } },
         { label: 'Restaurant Images', icon: '📸', onPress: () => { } },
         { label: 'Bank Details', icon: '🏦', onPress: () => { } },
-        { label: 'Notifications', icon: '🔔', onPress: () => { } },
+        { label: 'Notifications', icon: '🔔', onPress: () => navigation.navigate('RestaurantSettings') },
         { label: 'Help & Support', icon: '❓', onPress: () => { } },
-        { label: 'Settings', icon: '⚙️', onPress: () => { } },
+        { label: 'Settings', icon: '⚙️', onPress: () => navigation.navigate('RestaurantSettings') },
     ];
 
     return (

@@ -11,6 +11,7 @@ import EditProfileScreen from '../profile/EditProfileScreen';
 import OrderHistoryScreen from './OrderHistoryScreen';
 import OrderDetailsScreen from './OrderDetailsScreen';
 import { RestaurantStatusProvider } from './RestaurantStatusContext';
+import RestaurantSettingsScreen from './RestaurantSettingsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -67,6 +68,7 @@ export default function RestaurantNavigator() {
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
             <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
+            <Stack.Screen name="RestaurantSettings" component={RestaurantSettingsScreen} />
         </Stack.Navigator>
         </RestaurantStatusProvider>
     );
