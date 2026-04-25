@@ -12,6 +12,7 @@ import { clearPermissionFlags } from '../utils/clearPermissions';
 import { useFavourites } from '../utils/FavouritesContext';
 import { useLanguage } from '../utils/LanguageContext';
 import { useRestaurantStatus } from '../restaurant-admin/RestaurantStatusContext';
+import MapboxMap from '../components/MapboxMap';
 
 const CATEGORIES = [
     { id: 1, name: 'Biryani', icon: '🍛' },
@@ -49,11 +50,11 @@ const TOP_SELLERS = [
     { id: 4, name: 'Chicken Wings', restaurant: 'Wings & More', price: '$10.99', rating: 4.6, image: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400&q=80', category: 'Wings' },
 ];
 
-const RESTAURANTS = [
-    { id: 1, name: 'Gourmet Burger Kitchen', rating: 4.8, time: '20-30 min', offer: '20% OFF', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80', cuisine: 'Burgers' },
-    { id: 2, name: 'Sushi Master', rating: 4.9, time: '45-60 min', offer: 'Free Delivery', image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80', cuisine: 'Japanese' },
-    { id: 3, name: 'Pizza Palace', rating: 4.5, time: '15-25 min', offer: '30% OFF', image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800&q=80', cuisine: 'Italian' },
-    { id: 4, name: 'The Breakfast Club', rating: 4.7, time: '25-35 min', offer: 'Buy 1 Get 1', image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&q=80', cuisine: 'American' },
+export const RESTAURANTS = [
+    { id: 1, name: 'Gourmet Burger Kitchen', rating: 4.8, time: '20-30 min', offer: '20% OFF', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80', cuisine: 'Burgers', lat: 17.3850, lng: 78.4867 },
+    { id: 2, name: 'Sushi Master', rating: 4.9, time: '45-60 min', offer: 'Free Delivery', image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80', cuisine: 'Japanese', lat: 17.3950, lng: 78.4967 },
+    { id: 3, name: 'Pizza Palace', rating: 4.5, time: '15-25 min', offer: '30% OFF', image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800&q=80', cuisine: 'Italian', lat: 17.4050, lng: 78.5067 },
+    { id: 4, name: 'The Breakfast Club', rating: 4.7, time: '25-35 min', offer: 'Buy 1 Get 1', image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&q=80', cuisine: 'American', lat: 17.4150, lng: 78.5167 },
 ];
 
 export default function HomeScreen() {
@@ -264,7 +265,7 @@ export default function HomeScreen() {
                         <Text className="text-[#1DB954] font-bold text-lg">{t('app.currentLocation')}</Text>
                     </View>
                 </View>
-
+                <MapboxMap />
                 {/* Search Bar */}
                 <View className="px-4 py-4 relative z-10">
                     <View
