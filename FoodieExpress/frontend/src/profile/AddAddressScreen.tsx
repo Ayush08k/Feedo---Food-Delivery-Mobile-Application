@@ -197,6 +197,37 @@ After enabling, return here and tap the location button again.`;
                 </View>
             </TouchableOpacity>
 
+            {/* Pick from Map */}
+            <TouchableOpacity
+                className="bg-[#1E1E1E] p-6 rounded-2xl mb-4 border-2 border-[#333]"
+                onPress={() => {
+                    navigation.navigate('MapPicker', {
+                        onLocationSelected: (data: any) => {
+                            const { address } = data;
+                            setAddressForm({
+                                ...addressForm,
+                                street: `${address.name || ''} ${address.street || ''}`.trim(),
+                                city: address.city || '',
+                                state: address.region || '',
+                                zipCode: address.postalCode || ''
+                            });
+                            setViewMode('manual');
+                        }
+                    });
+                }}
+                disabled={isLoadingLocation}
+            >
+                <View className="flex-row items-center justify-center">
+                    <Text className="text-4xl mr-3">🗺️</Text>
+                    <View className="flex-1">
+                        <Text className="text-white font-bold text-lg">Pick from Map</Text>
+                        <Text className="text-[#A0A0A0] text-sm mt-1">
+                            Pin your exact location on the map
+                        </Text>
+                    </View>
+                </View>
+            </TouchableOpacity>
+
             {/* Enter Manually */}
             <TouchableOpacity
                 className="bg-[#1E1E1E] p-6 rounded-2xl border-2 border-[#333]"

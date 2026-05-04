@@ -21,12 +21,14 @@ import DriverNavigator from '../driver/DriverNavigator';
 import RestaurantNavigator from '../restaurant-admin/RestaurantNavigator';
 import DeliveryScreen from '../driver/DeliveryScreen';
 import EditProfileScreen from '../profile/EditProfileScreen';
+import TrackOrderScreen from '../profile/TrackOrderScreen';
 
 import RoleSelectionScreen from '../auth/RoleSelectionScreen';
 import FavouritesScreen from '../profile/FavouritesScreen';
 import LanguageScreen from '../profile/LanguageScreen';
 import AboutScreen from '../profile/AboutScreen';
 import FeedbackScreen from '../profile/FeedbackScreen';
+import MapPickerScreen from '../profile/MapPickerScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -61,6 +63,7 @@ export default function AppNavigator() {
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="YourOrders" component={YourOrdersScreen} />
             <Stack.Screen name="RateOrder" component={RateOrderScreen} />
+            <Stack.Screen name="TrackOrder" component={TrackOrderScreen} />
             <Stack.Screen name="ManageAddresses" component={ManageAddressesScreen} />
             <Stack.Screen name="AddAddress" component={AddAddressScreen} />
             <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
@@ -69,6 +72,7 @@ export default function AppNavigator() {
             <Stack.Screen name="Language" component={LanguageScreen} />
             <Stack.Screen name="About" component={AboutScreen} />
             <Stack.Screen name="Feedback" component={FeedbackScreen} />
+            <Stack.Screen name="MapPicker" component={MapPickerScreen} />
 
             {/* Driver App */}
             <Stack.Screen name="DriverApp" component={DriverNavigator} />

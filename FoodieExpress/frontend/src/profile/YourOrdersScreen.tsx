@@ -330,7 +330,10 @@ export default function YourOrdersScreen() {
                                         )}
                                         {order.status === 'in-transit' && (
                                             <>
-                                                <TouchableOpacity className="flex-1 bg-[#FFD93D] py-3 rounded-xl">
+                                                <TouchableOpacity 
+                                                    className="flex-1 bg-[#FFD93D] py-3 rounded-xl"
+                                                    onPress={() => navigation.navigate('TrackOrder', { orderId: order.id })}
+                                                >
                                                     <Text className="text-black text-center font-bold">Track Order</Text>
                                                 </TouchableOpacity>
                                                 <TouchableOpacity className="flex-1 bg-[#1E1E1E] py-3 rounded-xl border border-[#333]">

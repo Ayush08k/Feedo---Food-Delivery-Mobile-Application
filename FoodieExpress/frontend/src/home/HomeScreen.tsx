@@ -12,7 +12,7 @@ import { clearPermissionFlags } from '../utils/clearPermissions';
 import { useFavourites } from '../utils/FavouritesContext';
 import { useLanguage } from '../utils/LanguageContext';
 import { useRestaurantStatus } from '../restaurant-admin/RestaurantStatusContext';
-import MapboxMap from '../components/MapboxMap';
+import UniversalMap from '../components/UniversalMap';
 
 const CATEGORIES = [
     { id: 1, name: 'Biryani', icon: '🍛' },
@@ -265,7 +265,10 @@ export default function HomeScreen() {
                         <Text className="text-[#1DB954] font-bold text-lg">{t('app.currentLocation')}</Text>
                     </View>
                 </View>
-                <MapboxMap />
+                <UniversalMap 
+                    markers={RESTAURANTS.map(r => ({ id: r.id, lat: r.lat, lng: r.lng, title: r.name }))} 
+                    style={{ height: 250, marginBottom: 16 }}
+                />
                 {/* Search Bar */}
                 <View className="px-4 py-4 relative z-10">
                     <View
