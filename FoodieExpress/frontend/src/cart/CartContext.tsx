@@ -37,16 +37,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     const addMultipleToCart = (products: any[], restaurantId: number) => {
         setItems((prev) => {
-            const newItems = [...prev];
+            let nextItems = [...prev];
             products.forEach((product) => {
-                const existing = newItems.find((i) => i.id === product.id);
-                if (existing) {
-                    existing.quantity += product.quantity || 1;
+                const existingIndex = nextItems.findIndex((i) => i.id === product.id);
+                if (existingIndex > -1) {
+                    const existingItem = nextItems[existingIndex];
+                    nextItems[existingIndex] = { 
+                        ...existingItem, 
+                        quantity: existingItem.quantity + (product.quantity || 1) 
+                    };
                 } else {
-                    newItems.push({ ...product, quantity: product.quantity || 1, restaurantId });
+                    nextItems.push({ ...product, quantity: product.quantity || 1, restaurantId });
                 }
             });
-            return newItems;
+            return nextItems;
         });
     };
 

@@ -83,7 +83,7 @@ export default function RestaurantDetailsScreen() {
                 {items.length > 0 && (
                     <TouchableOpacity
                         className="bg-[#1DB954] p-4 rounded-xl flex-row justify-between items-center shadow-lg shadow-green-900/50"
-                        onPress={() => navigation.navigate('Cart')}
+                        onPress={() => navigation.navigate('Main', { screen: 'Cart' })}
                     >
                         <View className="bg-black/20 px-2 py-1 rounded">
                             <Text className="text-black font-bold">{items.reduce((s, i) => s + i.quantity, 0)} items</Text>

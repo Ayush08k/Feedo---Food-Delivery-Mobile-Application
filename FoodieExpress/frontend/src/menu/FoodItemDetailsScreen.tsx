@@ -269,6 +269,12 @@ export default function FoodItemDetailsScreen() {
                                 <TouchableOpacity
                                     className="w-12 h-12 bg-[#121212]/90 rounded-full items-center justify-center"
                                     style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4 }}
+                                    onPress={async () => {
+                                        const { Share } = await import('react-native');
+                                        Share.share({
+                                            message: `Check out this delicious ${item.name} from ${item.restaurant} on Feedo!`,
+                                        });
+                                    }}
                                 >
                                     <Text className="text-white text-2xl">↗</Text>
                                 </TouchableOpacity>

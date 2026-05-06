@@ -107,7 +107,7 @@ export default function YourOrdersScreen() {
                 `${order.itemCount} item(s) from ${order.restaurantName} have been added to your cart.`,
                 [
                     { text: 'Continue Shopping', style: 'cancel' },
-                    { text: 'View Cart', onPress: () => navigation.navigate('Cart') }
+                    { text: 'View Cart', onPress: () => navigation.navigate('Main', { screen: 'Cart' }) }
                 ]
             );
         }

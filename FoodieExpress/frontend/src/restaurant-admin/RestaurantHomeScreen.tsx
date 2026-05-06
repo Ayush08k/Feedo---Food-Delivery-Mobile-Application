@@ -180,6 +180,7 @@ export default function RestaurantHomeScreen() {
                         <TouchableOpacity
                             className="bg-[#1E1E1E] p-4 rounded-xl border border-[#333] items-center mb-4"
                             style={{ width: (width - 48) / 2 }}
+                            onPress={() => navigation.navigate('OrderHistory')}
                         >
                             <Text className="text-3xl mb-2">📊</Text>
                             <Text className="text-white font-semibold">Analytics</Text>
@@ -212,7 +213,7 @@ export default function RestaurantHomeScreen() {
                 <View className="px-4 pb-20">
                     <View className="flex-row justify-between items-center mb-4">
                         <Text className="text-white text-xl font-bold">Recent Orders</Text>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.navigate('OrderHistory')}>
                             <Text className="text-[#1DB954]">See All →</Text>
                         </TouchableOpacity>
                     </View>

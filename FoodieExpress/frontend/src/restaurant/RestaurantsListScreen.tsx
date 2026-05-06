@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { fetchAllRestaurants, Restaurant } from '../utils/restaurantApi';
 import { useRestaurantStatus } from '../restaurant-admin/RestaurantStatusContext';
 
 export default function RestaurantsListScreen() {
     const navigation = useNavigation<any>();
-    const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+    const route = useRoute<any>();
+    const { category } = route.params || {};
+    
+    const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]);
+    const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [sortOrder, setSortOrder] = useState<'high' | 'low'>('high');
@@ -23,7 +27,17 @@ export default function RestaurantsListScreen() {
             setLoading(true);
             setError(null);
             const data = await fetchAllRestaurants('rating');
-            setRestaurants(data);
+            setAllRestaurants(data);
+            
+            if (category) {
+                const filtered = data.filter(r => 
+                    r.cuisineType?.toLowerCase().includes(category.toLowerCase()) ||
+                    r.name?.toLowerCase().includes(category.toLowerCase())
+                );
+                setFilteredRestaurants(filtered);
+            } else {
+                setFilteredRestaurants(data);
+            }
         } catch (err) {
             console.error('Failed to load restaurants:', err);
             setError('Failed to load restaurants. Please try again.');
@@ -40,7 +54,7 @@ export default function RestaurantsListScreen() {
 
     const toggleSortOrder = () => {
         setSortOrder(prev => prev === 'high' ? 'low' : 'high');
-        setRestaurants(prev => [...prev].reverse());
+        setFilteredRestaurants(prev => [...prev].reverse());
     };
 
     const getDefaultImage = () => 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80';
@@ -84,7 +98,7 @@ export default function RestaurantsListScreen() {
             {/* Sort Controls */}
             <View className="px-4 py-3 bg-[#1E1E1E] border-b border-[#333] flex-row justify-between items-center">
                 <Text className="text-[#A0A0A0] text-sm">
-                    {isGlobalAppOpen ? restaurants.length : 0} restaurant{isGlobalAppOpen && restaurants.length !== 1 ? 's' : ''} found
+                    {isGlobalAppOpen ? filteredRestaurants.length : 0} {category ? `${category} ` : ''}restaurant{isGlobalAppOpen && filteredRestaurants.length !== 1 ? 's' : ''} found
                 </Text>
                 <TouchableOpacity
                     onPress={toggleSortOrder}
@@ -110,7 +124,7 @@ export default function RestaurantsListScreen() {
                     />
                 }
             >
-                {!isGlobalAppOpen || restaurants.length === 0 ? (
+                {!isGlobalAppOpen || filteredRestaurants.length === 0 ? (
                     <View className="flex-1 justify-center items-center py-20">
                         <Text className="text-[#A0A0A0] text-xl mb-2">🏪</Text>
                         <Text className="text-[#A0A0A0] text-lg">No restaurants available</Text>
@@ -118,7 +132,7 @@ export default function RestaurantsListScreen() {
                     </View>
                 ) : (
                     <View className="px-4 pt-4 pb-20">
-                        {restaurants.map((restaurant, index) => (
+                        {filteredRestaurants.map((restaurant, index) => (
                             <TouchableOpacity
                                 key={restaurant._id || index}
                                 className="mb-6 bg-[#1E1E1E] rounded-2xl overflow-hidden border border-[#333]"

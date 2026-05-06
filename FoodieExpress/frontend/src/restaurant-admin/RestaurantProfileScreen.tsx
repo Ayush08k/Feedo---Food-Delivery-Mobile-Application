@@ -3,10 +3,12 @@ import { View, Text, TouchableOpacity, ScrollView, Image, TextInput } from 'reac
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 import { loadProfileData } from '../utils/profileUtils';
+import { useAlert } from '../utils/AlertContext';
 
 export default function RestaurantProfileScreen() {
     const navigation = useNavigation<any>();
     const [profileData, setProfileData] = useState<any>(null);
+    const { showAlert } = useAlert();
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -35,11 +37,11 @@ export default function RestaurantProfileScreen() {
 
     const menuItems = [
         { label: 'Edit Restaurant Details', icon: '🏪', onPress: () => navigation.navigate('EditProfile', { role: 'restaurant' }) },
-        { label: 'Business Hours', icon: '🕒', onPress: () => { } },
-        { label: 'Restaurant Images', icon: '📸', onPress: () => { } },
-        { label: 'Bank Details', icon: '🏦', onPress: () => { } },
+        { label: 'Business Hours', icon: '🕒', onPress: () => showAlert('Business Hours', 'Current hours: Mon-Fri 9:00 AM - 11:00 PM\nSat-Sun 10:00 AM - 10:00 PM\n\nContact support to update your hours.') },
+        { label: 'Restaurant Images', icon: '📸', onPress: () => showAlert('Restaurant Images', 'Upload photos of your restaurant and food items to attract more customers. Use Edit Profile to update your images.') },
+        { label: 'Bank Details', icon: '🏦', onPress: () => showAlert('Bank Details', 'Bank Account: **** **** 4242\nAccount Holder: Burger King Ltd\nIFSC: HDFC0001234\n\nContact support to update bank details.') },
         { label: 'Notifications', icon: '🔔', onPress: () => navigation.navigate('RestaurantSettings') },
-        { label: 'Help & Support', icon: '❓', onPress: () => { } },
+        { label: 'Help & Support', icon: '❓', onPress: () => showAlert('Help & Support', 'Contact us:\n\nEmail: support@feedo.app\nPhone: +1-800-FEEDO-01\n\nLive chat is available 24/7 in the app.') },
         { label: 'Settings', icon: '⚙️', onPress: () => navigation.navigate('RestaurantSettings') },
     ];
 

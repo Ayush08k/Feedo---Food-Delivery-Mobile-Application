@@ -126,6 +126,7 @@ export default function DriverHomeScreen() {
                         <TouchableOpacity
                             className="bg-[#1E1E1E] p-4 rounded-xl border border-[#333] items-center mr-4 mb-4"
                             style={{ width: (width - 48) / 2 }}
+                            onPress={() => navigation.navigate('EarningsReport')}
                         >
                             <Text className="text-3xl mb-2">📊</Text>
                             <Text className="text-white font-semibold">Analytics</Text>
@@ -164,7 +165,7 @@ export default function DriverHomeScreen() {
                                     </View>
                                     <TouchableOpacity
                                         className="bg-[#1DB954] px-4 py-2 rounded-lg"
-                                        onPress={() => navigation.navigate('DriverDelivery')}
+                                        onPress={() => navigation.navigate('DriverDelivery', { orderId: order.id })}
                                     >
                                         <Text className="text-black font-bold text-sm">Accept</Text>
                                     </TouchableOpacity>

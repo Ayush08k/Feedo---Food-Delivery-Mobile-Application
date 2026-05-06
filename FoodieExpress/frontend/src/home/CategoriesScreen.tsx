@@ -51,6 +51,7 @@ export default function CategoriesScreen() {
                             key={cat.id}
                             className="w-[48%] mb-4 bg-[#1E1E1E] rounded-2xl p-4 border border-[#333] active:border-[#1DB954]"
                             activeOpacity={0.7}
+                            onPress={() => (navigation as any).navigate('RestaurantsList', { category: cat.name })}
                         >
                             <View className="items-center mb-3">
                                 <View className="w-16 h-16 bg-[#121212] rounded-2xl items-center justify-center mb-2 border border-[#333]">

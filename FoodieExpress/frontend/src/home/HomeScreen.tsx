@@ -406,7 +406,9 @@ export default function HomeScreen() {
                         <Text className="text-white text-xl font-bold px-4 mb-4">{t('home.categories')}</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
                             {displayedCategories.map((cat) => (
-                                <TouchableOpacity key={cat.id} className="mr-4 items-center">
+                                <TouchableOpacity key={cat.id} className="mr-4 items-center"
+                                    onPress={() => (navigation as any).navigate('RestaurantsList', { category: cat.name })}
+                                >
                                     <View className="w-16 h-16 bg-[#1E1E1E] rounded-full items-center justify-center mb-2 border border-[#333]">
                                         <Text className="text-2xl">{cat.icon}</Text>
                                     </View>

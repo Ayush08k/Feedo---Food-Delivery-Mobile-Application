@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useCart } from '../cart/CartContext';
 
 interface Offer {
     id: number;
@@ -25,6 +26,7 @@ export default function OfferDetailsScreen() {
     const navigation = useNavigation();
     const route = useRoute();
     const { offer } = route.params as { offer: Offer };
+    const { addToCart } = useCart();
     const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -175,6 +177,16 @@ export default function OfferDetailsScreen() {
                                                 <TouchableOpacity
                                                     className="px-4 py-2 rounded-lg"
                                                     style={{ backgroundColor: offer.color }}
+                                                    onPress={(e) => {
+                                                        e.stopPropagation();
+                                                        addToCart({
+                                                            id: item.id,
+                                                            name: item.name,
+                                                            price: discountedPrice ? parseFloat(discountedPrice.replace('$', '')) : parseFloat(item.price.replace('$', '')),
+                                                            image: item.image,
+                                                            description: `${item.name} from ${item.restaurant}`
+                                                        }, 1); // Mock restaurantId for demo
+                                                    }}
                                                 >
                                                     <Text className="text-white font-bold text-xs">Add +</Text>
                                                 </TouchableOpacity>

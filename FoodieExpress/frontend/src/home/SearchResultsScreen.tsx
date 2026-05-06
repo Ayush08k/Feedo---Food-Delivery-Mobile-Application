@@ -128,7 +128,7 @@ export default function SearchResultsScreen() {
                                     <TouchableOpacity
                                         key={restaurant.id}
                                         className="bg-[#1E1E1E] rounded-xl overflow-hidden mb-3 border border-[#333]"
-                                        onPress={() => (navigation as any).navigate('RestaurantDetails', { restaurantId: restaurant.id })}
+                                        onPress={() => (navigation as any).navigate('RestaurantDetails', { restaurant })}
                                     >
                                         <Image
                                             source={{ uri: restaurant.image }}
