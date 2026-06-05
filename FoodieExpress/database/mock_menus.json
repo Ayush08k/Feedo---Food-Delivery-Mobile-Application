@@ -1,0 +1,247 @@
+[
+    {
+        "restaurantName": "Burger Joint",
+        "categories": [
+            {
+                "name": "Mains",
+                "items": [
+                    { "name": "Classic Cheeseburger", "description": "Beef patty, cheese, lettuce, tomato", "price": 8.99, "imageUrl": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80" },
+                    { "name": "Double Bacon Burger", "description": "Two patties, bacon, double cheese", "price": 12.99, "imageUrl": "https://images.unsplash.com/photo-1594212691516-436f2f9c5d08?auto=format&fit=crop&w=400&q=80" }
+                ]
+            },
+            {
+                "name": "Sides & Drinks",
+                "items": [
+                    { "name": "French Fries", "description": "Crispy golden fries", "price": 3.99 },
+                    { "name": "Cola", "description": "Chilled soda", "price": 1.99 }
+                ]
+            }
+        ]
+    },
+    {
+        "restaurantName": "Pizzeria Napoli",
+        "categories": [
+            {
+                "name": "Mains",
+                "items": [
+                    { "name": "Margherita Pizza", "description": "Tomato, mozzarella, basil", "price": 14.99, "imageUrl": "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?auto=format&fit=crop&w=400&q=80" },
+                    { "name": "Pepperoni Pizza", "description": "Classic pepperoni", "price": 16.99, "imageUrl": "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=400&q=80" }
+                ]
+            },
+            {
+                "name": "Sides & Drinks",
+                "items": [
+                    { "name": "Garlic Bread", "description": "Toasted with garlic butter", "price": 5.99 }
+                ]
+            }
+        ]
+    },
+    {
+        "restaurantName": "Sushi Zen",
+        "categories": [
+            {
+                "name": "Mains",
+                "items": [
+                    { "name": "Salmon Nigiri", "description": "2 pieces fresh salmon on rice", "price": 6.99, "imageUrl": "https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=400&q=80" },
+                    { "name": "Spicy Tuna Roll", "description": "8 pieces classic roll", "price": 8.99, "imageUrl": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=400&q=80" }
+                ]
+            },
+            {
+                "name": "Sides & Drinks",
+                "items": [
+                    { "name": "Miso Soup", "description": "Traditional warm soup", "price": 3.50 }
+                ]
+            }
+        ]
+    },
+    {
+        "restaurantName": "The Curry House",
+        "categories": [
+            {
+                "name": "Mains",
+                "items": [
+                    { "name": "Chicken Tikka Masala", "description": "Creamy tomato curry with tender chicken", "price": 15.99, "imageUrl": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=400&q=80" },
+                    { "name": "Lamb Rogan Josh", "description": "Classic slow-cooked lamb curry", "price": 17.99, "imageUrl": "https://images.unsplash.com/photo-1603894584373-5ac82b6ae398?auto=format&fit=crop&w=400&q=80" }
+                ]
+            },
+            {
+                "name": "Sides & Drinks",
+                "items": [
+                    { "name": "Garlic Naan", "description": "Freshly baked flatbread with garlic", "price": 3.99 },
+                    { "name": "Mango Lassi", "description": "Sweet yogurt-based mango drink", "price": 4.50 }
+                ]
+            }
+        ]
+    },
+    {
+        "restaurantName": "Baguette & Co.",
+        "categories": [
+            {
+                "name": "Mains",
+                "items": [
+                    { "name": "Croque Monsieur", "description": "Classic French ham and cheese sandwich", "price": 10.99, "imageUrl": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=400&q=80" },
+                    { "name": "Quiche Lorraine", "description": "Savory tart with bacon and cheese", "price": 9.99, "imageUrl": "https://images.unsplash.com/photo-1616447545928-8686a9f45ce5?auto=format&fit=crop&w=400&q=80" }
+                ]
+            },
+            {
+                "name": "Pastries & Drinks",
+                "items": [
+                    { "name": "Butter Croissant", "description": "Flaky, buttery pastry", "price": 3.50 },
+                    { "name": "Cafe au Lait", "description": "French coffee with hot milk", "price": 4.00 }
+                ]
+            }
+        ]
+    },
+    {
+        "restaurantName": "Dragon Wok",
+        "categories": [
+            {
+                "name": "Mains",
+                "items": [
+                    { "name": "Kung Pao Chicken", "description": "Spicy stir-fry with peanuts and vegetables", "price": 13.99, "imageUrl": "https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=400&q=80" },
+                    { "name": "Beef Chow Fun", "description": "Stir-fried flat rice noodles with beef", "price": 14.99, "imageUrl": "https://images.unsplash.com/photo-1552611052-33e04de081de?auto=format&fit=crop&w=400&q=80" }
+                ]
+            },
+            {
+                "name": "Starters & Drinks",
+                "items": [
+                    { "name": "Spring Rolls (2pcs)", "description": "Crispy vegetable rolls", "price": 4.99 },
+                    { "name": "Jasmine Tea", "description": "Hot fragrant tea", "price": 2.50 }
+                ]
+            }
+        ]
+    },
+    {
+        "restaurantName": "Texas BBQ Grill",
+        "categories": [
+            {
+                "name": "Mains",
+                "items": [
+                    { "name": "Smoked Brisket Plate", "description": "Slow-smoked beef brisket with two sides", "price": 18.99, "imageUrl": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=400&q=80" },
+                    { "name": "Pork Ribs Half Rack", "description": "Fall-off-the-bone ribs with BBQ sauce", "price": 16.99, "imageUrl": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80" }
+                ]
+            },
+            {
+                "name": "Sides",
+                "items": [
+                    { "name": "Mac & Cheese", "description": "Creamy baked macaroni", "price": 5.99 },
+                    { "name": "Coleslaw", "description": "Fresh cabbage slaw", "price": 3.99 }
+                ]
+            }
+        ]
+    },
+    {
+        "restaurantName": "Vegan Delights",
+        "categories": [
+            {
+                "name": "Mains",
+                "items": [
+                    { "name": "Beyond Burger", "description": "Plant-based patty with vegan cheese", "price": 12.99, "imageUrl": "https://images.unsplash.com/photo-1594212691516-436f2f9c5d08?auto=format&fit=crop&w=400&q=80" },
+                    { "name": "Buddha Bowl", "description": "Quinoa, roasted veggies, and tahini dressing", "price": 14.99, "imageUrl": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=400&q=80" }
+                ]
+            },
+            {
+                "name": "Drinks",
+                "items": [
+                    { "name": "Green Smoothie", "description": "Spinach, kale, apple, and ginger", "price": 6.99 },
+                    { "name": "Kombucha", "description": "Fermented sparkling tea", "price": 4.99 }
+                ]
+            }
+        ]
+    },
+    {
+        "restaurantName": "Seafood Catch",
+        "categories": [
+            {
+                "name": "Mains",
+                "items": [
+                    { "name": "Grilled Salmon", "description": "Fresh Atlantic salmon with asparagus", "price": 21.99, "imageUrl": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=400&q=80" },
+                    { "name": "Fish & Chips", "description": "Crispy battered cod with thick-cut fries", "price": 16.99, "imageUrl": "https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?auto=format&fit=crop&w=400&q=80" }
+                ]
+            },
+            {
+                "name": "Starters & Drinks",
+                "items": [
+                    { "name": "Clam Chowder", "description": "Creamy New England style soup", "price": 7.99 },
+                    { "name": "Iced Tea", "description": "Freshly brewed cold tea", "price": 2.99 }
+                ]
+            }
+        ]
+    },
+    {
+        "restaurantName": "Mediterranean Grill",
+        "categories": [
+            {
+                "name": "Mains",
+                "items": [
+                    { "name": "Chicken Shawarma Wrap", "description": "Spiced chicken with garlic sauce in pita", "price": 11.99, "imageUrl": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=400&q=80" },
+                    { "name": "Falafel Plate", "description": "Crispy falafels with hummus and salad", "price": 13.99, "imageUrl": "https://images.unsplash.com/photo-1542314831-c6a4d142997b?auto=format&fit=crop&w=400&q=80" }
+                ]
+            },
+            {
+                "name": "Sides",
+                "items": [
+                    { "name": "Hummus & Pita", "description": "Creamy chickpea dip with warm pita", "price": 6.99 },
+                    { "name": "Tabbouleh Salad", "description": "Parsley, tomato, and bulgur salad", "price": 5.99 }
+                ]
+            }
+        ]
+    },
+    {
+        "restaurantName": "Seoul BBQ",
+        "categories": [
+            {
+                "name": "Mains",
+                "items": [
+                    { "name": "Beef Bulgogi", "description": "Marinated sweet and savory sliced beef", "price": 18.99, "imageUrl": "https://images.unsplash.com/photo-1580651315530-69c8e0026377?auto=format&fit=crop&w=400&q=80" },
+                    { "name": "Bibimbap", "description": "Mixed rice with vegetables, beef, and egg", "price": 15.99, "imageUrl": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=400&q=80" }
+                ]
+            },
+            {
+                "name": "Sides & Drinks",
+                "items": [
+                    { "name": "Kimchi", "description": "Spicy fermented cabbage", "price": 3.99 },
+                    { "name": "Soju", "description": "Traditional Korean spirit", "price": 8.99 }
+                ]
+            }
+        ]
+    },
+    {
+        "restaurantName": "Pancake World",
+        "categories": [
+            {
+                "name": "Mains",
+                "items": [
+                    { "name": "Buttermilk Pancakes", "description": "Stack of 3 fluffy pancakes with syrup", "price": 9.99, "imageUrl": "https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=400&q=80" },
+                    { "name": "Avocado Toast", "description": "Smashed avocado on sourdough with poached eggs", "price": 12.99, "imageUrl": "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=400&q=80" }
+                ]
+            },
+            {
+                "name": "Drinks",
+                "items": [
+                    { "name": "Fresh Orange Juice", "description": "Freshly squeezed", "price": 4.50 },
+                    { "name": "Cappuccino", "description": "Espresso with steamed milk foam", "price": 4.00 }
+                ]
+            }
+        ]
+    },
+    {
+        "restaurantName": "Gelato Heaven",
+        "categories": [
+            {
+                "name": "Desserts",
+                "items": [
+                    { "name": "Pistachio Gelato", "description": "Creamy gelato made with Sicilian pistachios", "price": 5.99, "imageUrl": "https://images.unsplash.com/photo-1563805042-7684c8e9e1cb?auto=format&fit=crop&w=400&q=80" },
+                    { "name": "Chocolate Hazelnut", "description": "Rich dark chocolate with roasted hazelnuts", "price": 5.99, "imageUrl": "https://images.unsplash.com/photo-1557142046-c704a3adf364?auto=format&fit=crop&w=400&q=80" }
+                ]
+            },
+            {
+                "name": "Drinks",
+                "items": [
+                    { "name": "Espresso", "description": "Single shot of Italian espresso", "price": 2.50 },
+                    { "name": "Affogato", "description": "Vanilla gelato drowned in hot espresso", "price": 6.99 }
+                ]
+            }
+        ]
+    }
+]

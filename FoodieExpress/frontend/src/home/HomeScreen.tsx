@@ -239,7 +239,7 @@ export default function HomeScreen() {
         <TouchableWithoutFeedback onPress={dismissSearch}>
             <SafeAreaView className="flex-1 bg-[#121212]">
                 {/* Header */}
-                <View className="px-4 py-4 bg-[#121212] border-b border-[#333] relative">
+                <View className="px-4 py-4 bg-[#121212] border-b border-[#333]">
                     <View className="flex-row justify-between items-center">
                         <Image
                             source={require('../../assets/logo.png')}
@@ -259,10 +259,6 @@ export default function HomeScreen() {
                             </View>
                             <Text className="text-white font-semibold">{profile?.name?.split(' ')[0] || 'Guest'}</Text>
                         </TouchableOpacity>
-                    </View>
-                    <View className="absolute left-0 right-0 items-center" style={{ top: 13, marginLeft: 40 }}>
-                        <Text className="text-[#A0A0A0] text-sm uppercase">{t('app.deliverTo')}</Text>
-                        <Text className="text-[#1DB954] font-bold text-lg">{t('app.currentLocation')}</Text>
                     </View>
                 </View>
                 <UniversalMap 

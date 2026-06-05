@@ -13,6 +13,8 @@ interface Address {
     state: string;
     zipCode: string;
     landmark?: string;
+    lat?: number | null;
+    lng?: number | null;
     isDefault: boolean;
 }
 
@@ -144,8 +146,13 @@ export default function ManageAddressesScreen() {
                                     </View>
                                     <Text className="text-[#A0A0A0] text-sm mb-1">{address.street}</Text>
                                     <Text className="text-[#A0A0A0] text-sm mb-1">
-                                        {address.city}, {address.state} {address.zipCode}
+                                        {address.city}{address.state ? `, ${address.state}` : ''}{address.zipCode ? ` ${address.zipCode}` : ''}
                                     </Text>
+                                    {address.lat != null && address.lng != null && (
+                                        <Text className="text-[#1DB954] text-xs mt-1 font-medium">
+                                            🌐 {address.lat.toFixed(5)}, {address.lng.toFixed(5)}
+                                        </Text>
+                                    )}
                                     {address.landmark && (
                                         <Text className="text-[#666] text-xs mt-1">
                                             📍 {address.landmark}

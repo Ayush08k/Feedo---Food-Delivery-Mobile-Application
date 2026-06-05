@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useCart } from '../cart/CartContext';
+import UniversalMap from '../components/UniversalMap';
 
 const MENU_ITEMS = [
     { id: 1, name: 'Double Cheeseburger', description: 'Two beef patties, cheddar, lettuce, tomato, house sauce.', price: 14, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80' },
@@ -15,6 +16,14 @@ export default function RestaurantDetailsScreen() {
     const { addToCart, items, total } = useCart();
     const route = useRoute<any>();
     const { restaurant } = route.params || { restaurant: { name: 'Restaurant Name', rating: 4.8, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80' } };
+
+    const lat = restaurant.lat || 17.3850;
+    const lng = restaurant.lng || 78.4867;
+
+    const handleGetDirections = () => {
+        const url = `https://www.openstreetmap.org/directions?from=&to=${lat},${lng}`;
+        Linking.openURL(url);
+    };
 
     return (
         <View className="flex-1 bg-[#121212]">
@@ -38,6 +47,24 @@ export default function RestaurantDetailsScreen() {
                     </View>
                 </View>
                 <Text className="text-[#A0A0A0] mb-6">Burger • American • 20-30 min</Text>
+
+                {/* 🗺️ OSM Location Map */}
+                <Text className="text-white text-xl font-bold mb-3">📍 Location</Text>
+                <View className="rounded-2xl overflow-hidden border border-[#333] mb-3" style={{ height: 200 }}>
+                    <UniversalMap
+                        lat={lat}
+                        lng={lng}
+                        zoom={15}
+                        markers={[{ id: restaurant.id || 1, lat, lng, title: restaurant.name }]}
+                    />
+                </View>
+                <TouchableOpacity
+                    className="bg-[#1E1E1E] border border-[#1DB954] p-3 rounded-xl flex-row items-center justify-center mb-6"
+                    onPress={handleGetDirections}
+                >
+                    <Text className="text-[#1DB954] font-bold mr-2">🧭</Text>
+                    <Text className="text-[#1DB954] font-bold">Get Directions (OpenStreetMap)</Text>
+                </TouchableOpacity>
 
                 <Text className="text-white text-xl font-bold mb-4">Menu</Text>
 

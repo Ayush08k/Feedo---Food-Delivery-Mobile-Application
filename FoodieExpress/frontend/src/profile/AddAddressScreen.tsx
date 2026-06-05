@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -8,6 +8,7 @@ import * as Location from 'expo-location';
 type AddressType = 'home' | 'work' | 'other';
 
 interface AddressForm {
+    label: string;         // Custom name e.g. "Mom's House"
     type: AddressType;
     houseName: string;
     street: string;
@@ -15,9 +16,11 @@ interface AddressForm {
     state: string;
     zipCode: string;
     landmark: string;
+    lat: number | null;
+    lng: number | null;
 }
 
-type ViewMode = 'selection' | 'gps' | 'manual';
+type ViewMode = 'selection' | 'manual';
 
 export default function AddAddressScreen() {
     const navigation = useNavigation<any>();
@@ -27,374 +30,378 @@ export default function AddAddressScreen() {
     const [viewMode, setViewMode] = useState<ViewMode>('selection');
     const [isLoadingLocation, setIsLoadingLocation] = useState(false);
     const [addressForm, setAddressForm] = useState<AddressForm>({
+        label: '',
         type: 'home',
         houseName: '',
         street: '',
         city: '',
         state: '',
         zipCode: '',
-        landmark: ''
+        landmark: '',
+        lat: null,
+        lng: null,
     });
-    const [errors, setErrors] = useState<Partial<AddressForm>>({});
+    const [errors, setErrors] = useState<Partial<Record<keyof AddressForm, string>>>({});
 
+    const updateField = (field: keyof AddressForm, value: any) => {
+        setAddressForm(prev => ({ ...prev, [field]: value }));
+        if (errors[field]) setErrors(prev => ({ ...prev, [field]: undefined }));
+    };
+
+    // ── GPS auto-fill ──────────────────────────────────────────
     const requestLocationPermission = async () => {
         setIsLoadingLocation(true);
         try {
-            // Check current permission status
-            const { status: existingStatus } = await Location.getForegroundPermissionsAsync();
-
-            // If already permanently denied, show settings instructions
-            if (existingStatus === 'denied') {
-                setIsLoadingLocation(false);
-                showLocationSettingsInstructions();
-                return;
-            }
-
+            const { status: ex } = await Location.getForegroundPermissionsAsync();
+            if (ex === 'denied') { setIsLoadingLocation(false); showLocationDenied(); return; }
             const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') { setIsLoadingLocation(false); showLocationDenied(); return; }
 
-            if (status !== 'granted') {
-                setIsLoadingLocation(false);
-                showLocationSettingsInstructions();
-                return;
+            const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+            const { latitude, longitude } = loc.coords;
+            const results = await Location.reverseGeocodeAsync({ latitude, longitude });
+
+            if (results.length > 0) {
+                const a = results[0];
+                setAddressForm(prev => ({
+                    ...prev,
+                    street: `${a.name || ''} ${a.street || ''}`.trim(),
+                    city: a.city || '',
+                    state: a.region || '',
+                    zipCode: a.postalCode || '',
+                    lat: latitude,
+                    lng: longitude,
+                }));
+                setViewMode('manual');
             }
-
-            // Get current location
-            const location = await Location.getCurrentPositionAsync({
-                accuracy: Location.Accuracy.Balanced
-            });
-
-            // Reverse geocode to get address
-            const addresses = await Location.reverseGeocodeAsync({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude
-            });
-
-            if (addresses.length > 0) {
-                const address = addresses[0];
-                setAddressForm({
-                    ...addressForm,
-                    street: `${address.name || ''} ${address.street || ''}`.trim(),
-                    city: address.city || '',
-                    state: address.region || '',
-                    zipCode: address.postalCode || ''
-                });
-                setViewMode('manual'); // Show form with pre-filled data
-            }
-        } catch (error) {
-            console.error('Location error:', error);
-            showAlert(
-                'Location Error',
-                'Unable to retrieve your location. Please enter your address manually.',
-                [{ text: 'OK', onPress: () => setViewMode('manual') }]
-            );
+        } catch {
+            showAlert('Location Error', 'Unable to get your location. Please enter manually.', [
+                { text: 'OK', onPress: () => setViewMode('manual') }
+            ]);
         } finally {
             setIsLoadingLocation(false);
         }
     };
 
-    const showLocationSettingsInstructions = () => {
-        const instructions = `To enable location access:
-
-📱 **Android:**
-1. Open your device Settings
-2. Go to Apps → Feedo
-3. Tap Permissions
-4. Find Location
-5. Select "Allow only while using the app"
-
-🍎 **iOS:**
-1. Open Settings app
-2. Scroll down to Feedo
-3. Tap on Location
-4. Select "While Using the App"
-
-After enabling, return here and tap the location button again.`;
-
-        showAlert(
-            '📍 Location Permission Required',
-            instructions,
+    const showLocationDenied = () => {
+        showAlert('📍 Location Permission Required',
+            'Enable location in your device Settings to use this feature.',
             [
-                { text: 'Enter Manually Instead', onPress: () => setViewMode('manual') },
-                { text: 'Got It', style: 'cancel' }
+                { text: 'Enter Manually', onPress: () => setViewMode('manual') },
+                { text: 'OK', style: 'cancel' }
             ]
         );
     };
 
-    const validateForm = (): boolean => {
-        const newErrors: Partial<AddressForm> = {};
-
-        if (!addressForm.houseName.trim()) newErrors.houseName = 'House/Flat name is required';
-        if (!addressForm.street.trim()) newErrors.street = 'Street address is required';
-        if (!addressForm.city.trim()) newErrors.city = 'City is required';
-        if (!addressForm.state.trim()) newErrors.state = 'State is required';
-        if (!addressForm.zipCode.trim()) newErrors.zipCode = 'Pincode is required';
-        else if (!/^\d{6}$/.test(addressForm.zipCode.trim())) newErrors.zipCode = 'Enter valid 6-digit pincode';
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+    // ── Map picker callback ───────────────────────────────────
+    const openMapPicker = () => {
+        navigation.navigate('MapPicker', {
+            onLocationSelected: (data: any) => {
+                const { coords, nominatim } = data;
+                // nominatim has: street, city, state, postalCode, displayAddress
+                setAddressForm(prev => ({
+                    ...prev,
+                    street: nominatim?.street || nominatim?.displayAddress || '',
+                    city: nominatim?.city || '',
+                    state: nominatim?.state || '',
+                    zipCode: nominatim?.postalCode || '',
+                    lat: coords.lat,
+                    lng: coords.lng,
+                }));
+                setViewMode('manual');
+            }
+        });
     };
 
-    const handleSubmit = () => {
-        if (!validateForm()) {
-            showAlert('Validation Error', 'Please fill in all required fields correctly.');
-            return;
-        }
+    // ── Validation ────────────────────────────────────────────
+    const validateForm = (): boolean => {
+        const e: Partial<Record<keyof AddressForm, string>> = {};
+        if (!addressForm.label.trim()) e.label = 'Give this address a name (e.g. Home, Office)';
+        if (!addressForm.street.trim()) e.street = 'Street address is required';
+        if (!addressForm.city.trim()) e.city = 'City is required';
+        setErrors(e);
+        return Object.keys(e).length === 0;
+    };
 
-        // Create address object with unique ID
+    // ── Save ──────────────────────────────────────────────────
+    const handleSubmit = () => {
+        if (!validateForm()) return;
+
         const newAddress = {
             id: Date.now().toString(),
             type: addressForm.type,
-            name: addressForm.type.charAt(0).toUpperCase() + addressForm.type.slice(1),
-            street: `${addressForm.houseName}, ${addressForm.street}`,
+            name: addressForm.label.trim() ||
+                (addressForm.type === 'home' ? 'Home' : addressForm.type === 'work' ? 'Work' : 'Other'),
+            street: `${addressForm.houseName ? addressForm.houseName + ', ' : ''}${addressForm.street}`.trim(),
             city: addressForm.city,
             state: addressForm.state,
             zipCode: addressForm.zipCode,
             landmark: addressForm.landmark,
-            isDefault: false
+            lat: addressForm.lat,
+            lng: addressForm.lng,
+            isDefault: false,
         };
 
-        // If there's a callback from the previous screen, call it
-        if (route.params?.onAddAddress) {
-            route.params.onAddAddress(newAddress);
-        }
-
-        showAlert('Success', 'Address added successfully!', [
+        if (route.params?.onAddAddress) route.params.onAddAddress(newAddress);
+        showAlert('✅ Address Saved!', `"${newAddress.name}" has been added to your addresses.`, [
             { text: 'OK', onPress: () => navigation.goBack() }
         ]);
     };
 
-    const updateField = (field: keyof AddressForm, value: string) => {
-        setAddressForm({ ...addressForm, [field]: value });
-        // Clear error for this field when user starts typing
-        if (errors[field]) {
-            setErrors({ ...errors, [field]: undefined });
-        }
-    };
-
+    // ── Selection Screen ──────────────────────────────────────
     const renderSelectionView = () => (
-        <View className="flex-1 px-6 justify-center">
-            <Text className="text-white text-2xl font-bold text-center mb-4">
-                How would you like to add your address?
+        <View style={{ flex: 1, paddingHorizontal: 24, justifyContent: 'center' }}>
+            <Text style={{ color: 'white', fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 8 }}>
+                How to add your address?
             </Text>
-            <Text className="text-[#A0A0A0] text-center mb-8">
+            <Text style={{ color: '#A0A0A0', textAlign: 'center', marginBottom: 32 }}>
                 Choose your preferred method
             </Text>
 
-            {/* Use Current Location */}
+            {/* GPS */}
             <TouchableOpacity
-                className="bg-[#1DB954] p-6 rounded-2xl mb-4"
-                onPress={requestLocationPermission}
-                disabled={isLoadingLocation}
+                style={{ backgroundColor: '#1DB954', padding: 20, borderRadius: 20, marginBottom: 14 }}
+                onPress={requestLocationPermission} disabled={isLoadingLocation}
             >
-                <View className="flex-row items-center justify-center">
-                    <Text className="text-4xl mr-3">📍</Text>
-                    <View className="flex-1">
-                        <Text className="text-black font-bold text-lg">Use My Current Location</Text>
-                        <Text className="text-black/70 text-sm mt-1">
-                            We'll fetch your address automatically
-                        </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 32, marginRight: 14 }}>📍</Text>
+                    <View style={{ flex: 1 }}>
+                        <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16 }}>Use My Current Location</Text>
+                        <Text style={{ color: 'rgba(0,0,0,0.6)', fontSize: 13, marginTop: 2 }}>Auto-fill address from GPS</Text>
                     </View>
                 </View>
             </TouchableOpacity>
 
-            {/* Pick from Map */}
+            {/* Map Picker */}
             <TouchableOpacity
-                className="bg-[#1E1E1E] p-6 rounded-2xl mb-4 border-2 border-[#333]"
-                onPress={() => {
-                    navigation.navigate('MapPicker', {
-                        onLocationSelected: (data: any) => {
-                            const { address } = data;
-                            setAddressForm({
-                                ...addressForm,
-                                street: `${address.name || ''} ${address.street || ''}`.trim(),
-                                city: address.city || '',
-                                state: address.region || '',
-                                zipCode: address.postalCode || ''
-                            });
-                            setViewMode('manual');
-                        }
-                    });
-                }}
-                disabled={isLoadingLocation}
+                style={{ backgroundColor: '#1E1E1E', padding: 20, borderRadius: 20, marginBottom: 14, borderWidth: 2, borderColor: '#333' }}
+                onPress={openMapPicker} disabled={isLoadingLocation}
             >
-                <View className="flex-row items-center justify-center">
-                    <Text className="text-4xl mr-3">🗺️</Text>
-                    <View className="flex-1">
-                        <Text className="text-white font-bold text-lg">Pick from Map</Text>
-                        <Text className="text-[#A0A0A0] text-sm mt-1">
-                            Pin your exact location on the map
-                        </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 32, marginRight: 14 }}>🗺️</Text>
+                    <View style={{ flex: 1 }}>
+                        <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Pick from Map</Text>
+                        <Text style={{ color: '#A0A0A0', fontSize: 13, marginTop: 2 }}>Pin your exact location on the OSM map</Text>
                     </View>
                 </View>
             </TouchableOpacity>
 
-            {/* Enter Manually */}
+            {/* Manual */}
             <TouchableOpacity
-                className="bg-[#1E1E1E] p-6 rounded-2xl border-2 border-[#333]"
-                onPress={() => setViewMode('manual')}
-                disabled={isLoadingLocation}
+                style={{ backgroundColor: '#1E1E1E', padding: 20, borderRadius: 20, borderWidth: 2, borderColor: '#333' }}
+                onPress={() => setViewMode('manual')} disabled={isLoadingLocation}
             >
-                <View className="flex-row items-center justify-center">
-                    <Text className="text-4xl mr-3">✍️</Text>
-                    <View className="flex-1">
-                        <Text className="text-white font-bold text-lg">Enter Manually</Text>
-                        <Text className="text-[#A0A0A0] text-sm mt-1">
-                            Fill in your address details
-                        </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 32, marginRight: 14 }}>✍️</Text>
+                    <View style={{ flex: 1 }}>
+                        <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Enter Manually</Text>
+                        <Text style={{ color: '#A0A0A0', fontSize: 13, marginTop: 2 }}>Fill in your address details</Text>
                     </View>
                 </View>
             </TouchableOpacity>
 
             {isLoadingLocation && (
-                <View className="mt-6 items-center">
+                <View style={{ marginTop: 24, alignItems: 'center' }}>
                     <ActivityIndicator size="large" color="#1DB954" />
-                    <Text className="text-[#A0A0A0] mt-2">Getting your location...</Text>
+                    <Text style={{ color: '#A0A0A0', marginTop: 8 }}>Getting your location…</Text>
                 </View>
             )}
         </View>
     );
 
+    // ── Manual Form ───────────────────────────────────────────
     const renderManualForm = () => (
-        <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
-            {/* Address Type Selection */}
-            <Text className="text-white font-bold text-lg mb-3">Address Type *</Text>
-            <View className="flex-row mb-6">
-                {(['home', 'work', 'other'] as AddressType[]).map((type) => (
+        <ScrollView style={{ flex: 1, paddingHorizontal: 16, paddingTop: 16 }} showsVerticalScrollIndicator={false}>
+
+            {/* 📛 Address Label / Name */}
+            <View style={{
+                backgroundColor: '#1E1E1E', borderRadius: 16, padding: 16,
+                borderWidth: 2, borderColor: '#1DB954', marginBottom: 20
+            }}>
+                <Text style={{ color: '#1DB954', fontWeight: 'bold', fontSize: 12, textTransform: 'uppercase', marginBottom: 8 }}>
+                    📛 Save This Address As
+                </Text>
+                <TextInput
+                    style={{
+                        color: 'white', fontSize: 18, fontWeight: 'bold',
+                        borderBottomWidth: 1, borderBottomColor: errors.label ? '#ef4444' : '#333',
+                        paddingVertical: 6
+                    }}
+                    placeholder="e.g. Home, Office, Mom's House…"
+                    placeholderTextColor="#555"
+                    value={addressForm.label}
+                    onChangeText={v => updateField('label', v)}
+                />
+                {errors.label && (
+                    <Text style={{ color: '#ef4444', fontSize: 12, marginTop: 6 }}>{errors.label}</Text>
+                )}
+            </View>
+
+            {/* 📌 GPS Coordinates (if available) */}
+            {addressForm.lat !== null && addressForm.lng !== null && (
+                <View style={{
+                    backgroundColor: '#0d2118', borderRadius: 12, padding: 12,
+                    marginBottom: 20, flexDirection: 'row', alignItems: 'center',
+                    borderWidth: 1, borderColor: '#1DB954'
+                }}>
+                    <Text style={{ fontSize: 20, marginRight: 10 }}>🌐</Text>
+                    <View>
+                        <Text style={{ color: '#1DB954', fontSize: 11, fontWeight: 'bold', textTransform: 'uppercase' }}>
+                            GPS Coordinates
+                        </Text>
+                        <Text style={{ color: 'white', fontSize: 13, marginTop: 2 }}>
+                            {addressForm.lat.toFixed(6)}, {addressForm.lng.toFixed(6)}
+                        </Text>
+                    </View>
+                </View>
+            )}
+
+            {/* Address Type */}
+            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 15, marginBottom: 10 }}>Address Type</Text>
+            <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+                {(['home', 'work', 'other'] as AddressType[]).map(type => (
                     <TouchableOpacity
                         key={type}
-                        className={`flex-1 py-3 rounded-xl mr-2 border-2 ${addressForm.type === type
-                            ? 'bg-[#1DB954] border-[#1DB954]'
-                            : 'bg-[#1E1E1E] border-[#333]'
-                            }`}
+                        style={{
+                            flex: 1, paddingVertical: 12, borderRadius: 12, marginRight: 8,
+                            backgroundColor: addressForm.type === type ? '#1DB954' : '#1E1E1E',
+                            borderWidth: 2, borderColor: addressForm.type === type ? '#1DB954' : '#333'
+                        }}
                         onPress={() => updateField('type', type)}
                     >
-                        <Text
-                            className={`text-center font-bold ${addressForm.type === type ? 'text-black' : 'text-white'
-                                }`}
-                        >
+                        <Text style={{
+                            textAlign: 'center', fontWeight: 'bold',
+                            color: addressForm.type === type ? 'black' : 'white'
+                        }}>
                             {type === 'home' ? '🏠 Home' : type === 'work' ? '💼 Work' : '📍 Other'}
                         </Text>
                     </TouchableOpacity>
                 ))}
             </View>
 
-            {/* House/Flat Name */}
-            <Text className="text-white font-bold text-base mb-2">House/Flat Name *</Text>
+            {/* House / Flat */}
+            <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8 }}>House / Flat (Optional)</Text>
             <TextInput
-                className={`bg-[#1E1E1E] text-white p-4 rounded-xl mb-1 border-2 ${errors.houseName ? 'border-red-500' : 'border-[#333]'
-                    }`}
-                placeholder="e.g., Flat 4B, Building A"
-                placeholderTextColor="#666"
+                style={{
+                    backgroundColor: '#1E1E1E', color: 'white', padding: 14,
+                    borderRadius: 12, marginBottom: 16, borderWidth: 2, borderColor: '#333'
+                }}
+                placeholder="e.g. Flat 4B, Building A"
+                placeholderTextColor="#555"
                 value={addressForm.houseName}
-                onChangeText={(value) => updateField('houseName', value)}
+                onChangeText={v => updateField('houseName', v)}
             />
-            {errors.houseName && <Text className="text-red-500 text-xs mb-3 ml-2">{errors.houseName}</Text>}
-            {!errors.houseName && <View className="mb-3" />}
 
-            {/* Street Address */}
-            <Text className="text-white font-bold text-base mb-2">Street Address *</Text>
+            {/* Street */}
+            <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8 }}>Street Address *</Text>
             <TextInput
-                className={`bg-[#1E1E1E] text-white p-4 rounded-xl mb-1 border-2 ${errors.street ? 'border-red-500' : 'border-[#333]'
-                    }`}
-                placeholder="e.g., 123 Main Street"
-                placeholderTextColor="#666"
+                style={{
+                    backgroundColor: '#1E1E1E', color: 'white', padding: 14,
+                    borderRadius: 12, marginBottom: 4, borderWidth: 2,
+                    borderColor: errors.street ? '#ef4444' : '#333'
+                }}
+                placeholder="e.g. 123 Main Street"
+                placeholderTextColor="#555"
                 value={addressForm.street}
-                onChangeText={(value) => updateField('street', value)}
+                onChangeText={v => updateField('street', v)}
             />
-            {errors.street && <Text className="text-red-500 text-xs mb-3 ml-2">{errors.street}</Text>}
-            {!errors.street && <View className="mb-3" />}
+            {errors.street && <Text style={{ color: '#ef4444', fontSize: 12, marginBottom: 12 }}>{errors.street}</Text>}
+            {!errors.street && <View style={{ marginBottom: 16 }} />}
 
             {/* City */}
-            <Text className="text-white font-bold text-base mb-2">City *</Text>
+            <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8 }}>City *</Text>
             <TextInput
-                className={`bg-[#1E1E1E] text-white p-4 rounded-xl mb-1 border-2 ${errors.city ? 'border-red-500' : 'border-[#333]'
-                    }`}
-                placeholder="e.g., Mumbai"
-                placeholderTextColor="#666"
+                style={{
+                    backgroundColor: '#1E1E1E', color: 'white', padding: 14,
+                    borderRadius: 12, marginBottom: 4, borderWidth: 2,
+                    borderColor: errors.city ? '#ef4444' : '#333'
+                }}
+                placeholder="e.g. Hyderabad"
+                placeholderTextColor="#555"
                 value={addressForm.city}
-                onChangeText={(value) => updateField('city', value)}
+                onChangeText={v => updateField('city', v)}
             />
-            {errors.city && <Text className="text-red-500 text-xs mb-3 ml-2">{errors.city}</Text>}
-            {!errors.city && <View className="mb-3" />}
+            {errors.city && <Text style={{ color: '#ef4444', fontSize: 12, marginBottom: 12 }}>{errors.city}</Text>}
+            {!errors.city && <View style={{ marginBottom: 16 }} />}
 
-            {/* State and Pincode Row */}
-            <View className="flex-row mb-4">
-                <View className="flex-1 mr-2">
-                    <Text className="text-white font-bold text-base mb-2">State *</Text>
+            {/* State + Pincode row */}
+            <View style={{ flexDirection: 'row', marginBottom: 16 }}>
+                <View style={{ flex: 1, marginRight: 8 }}>
+                    <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8 }}>State</Text>
                     <TextInput
-                        className={`bg-[#1E1E1E] text-white p-4 rounded-xl mb-1 border-2 ${errors.state ? 'border-red-500' : 'border-[#333]'
-                            }`}
-                        placeholder="e.g., Maharashtra"
-                        placeholderTextColor="#666"
+                        style={{
+                            backgroundColor: '#1E1E1E', color: 'white', padding: 14,
+                            borderRadius: 12, borderWidth: 2, borderColor: '#333'
+                        }}
+                        placeholder="e.g. Telangana"
+                        placeholderTextColor="#555"
                         value={addressForm.state}
-                        onChangeText={(value) => updateField('state', value)}
+                        onChangeText={v => updateField('state', v)}
                     />
-                    {errors.state && <Text className="text-red-500 text-xs ml-2">{errors.state}</Text>}
                 </View>
-                <View className="flex-1 ml-2">
-                    <Text className="text-white font-bold text-base mb-2">Pincode *</Text>
+                <View style={{ flex: 1, marginLeft: 8 }}>
+                    <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8 }}>Pincode</Text>
                     <TextInput
-                        className={`bg-[#1E1E1E] text-white p-4 rounded-xl mb-1 border-2 ${errors.zipCode ? 'border-red-500' : 'border-[#333]'
-                            }`}
-                        placeholder="e.g., 400001"
-                        placeholderTextColor="#666"
+                        style={{
+                            backgroundColor: '#1E1E1E', color: 'white', padding: 14,
+                            borderRadius: 12, borderWidth: 2, borderColor: '#333'
+                        }}
+                        placeholder="e.g. 500001"
+                        placeholderTextColor="#555"
                         value={addressForm.zipCode}
-                        onChangeText={(value) => updateField('zipCode', value)}
+                        onChangeText={v => updateField('zipCode', v)}
                         keyboardType="numeric"
                         maxLength={6}
                     />
-                    {errors.zipCode && <Text className="text-red-500 text-xs ml-2">{errors.zipCode}</Text>}
                 </View>
             </View>
 
-            {/* Landmark (Optional) */}
-            <Text className="text-white font-bold text-base mb-2">Landmark (Optional)</Text>
+            {/* Landmark */}
+            <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8 }}>Landmark (Optional)</Text>
             <TextInput
-                className="bg-[#1E1E1E] text-white p-4 rounded-xl mb-4 border-2 border-[#333]"
-                placeholder="e.g., Near Central Park"
-                placeholderTextColor="#666"
+                style={{
+                    backgroundColor: '#1E1E1E', color: 'white', padding: 14,
+                    borderRadius: 12, marginBottom: 24, borderWidth: 2, borderColor: '#333'
+                }}
+                placeholder="e.g. Near City Mall"
+                placeholderTextColor="#555"
                 value={addressForm.landmark}
-                onChangeText={(value) => updateField('landmark', value)}
+                onChangeText={v => updateField('landmark', v)}
             />
 
-            {/* Submit Button */}
+            {/* Save Button */}
             <TouchableOpacity
-                className="bg-[#1DB954] p-4 rounded-xl mb-4"
+                style={{ backgroundColor: '#1DB954', padding: 16, borderRadius: 14, alignItems: 'center', marginBottom: 12 }}
                 onPress={handleSubmit}
             >
-                <Text className="text-black text-center font-bold text-lg">Save Address</Text>
+                <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 17 }}>💾 Save Address</Text>
             </TouchableOpacity>
 
-            {/* Back to Selection */}
-            {viewMode === 'manual' && (
-                <TouchableOpacity
-                    className="bg-[#1E1E1E] p-4 rounded-xl mb-6 border-2 border-[#333]"
-                    onPress={() => setViewMode('selection')}
-                >
-                    <Text className="text-white text-center font-bold text-base">
-                        ← Back to Options
-                    </Text>
-                </TouchableOpacity>
-            )}
-
-            <View className="h-20" />
+            <TouchableOpacity
+                style={{
+                    backgroundColor: '#1E1E1E', padding: 14, borderRadius: 14,
+                    alignItems: 'center', marginBottom: 40, borderWidth: 2, borderColor: '#333'
+                }}
+                onPress={() => setViewMode('selection')}
+            >
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>← Back to Options</Text>
+            </TouchableOpacity>
         </ScrollView>
     );
 
     return (
-        <SafeAreaView className="flex-1 bg-[#121212]">
-            {/* Header */}
-            <View className="px-4 py-4 border-b border-[#333] flex-row items-center justify-between">
-                <View className="flex-row items-center">
-                    <TouchableOpacity onPress={() => navigation.goBack()} className="mr-4">
-                        <Text className="text-[#1DB954] text-2xl">←</Text>
-                    </TouchableOpacity>
-                    <Text className="text-white text-xl font-bold">Add New Address</Text>
-                </View>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#121212' }}>
+            <View style={{
+                paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1,
+                borderBottomColor: '#333', flexDirection: 'row', alignItems: 'center'
+            }}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: 14 }}>
+                    <Text style={{ color: '#1DB954', fontSize: 24 }}>←</Text>
+                </TouchableOpacity>
+                <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>Add New Address</Text>
             </View>
 
-            {viewMode === 'selection' && renderSelectionView()}
-            {viewMode === 'manual' && renderManualForm()}
+            {viewMode === 'selection' ? renderSelectionView() : renderManualForm()}
         </SafeAreaView>
     );
 }

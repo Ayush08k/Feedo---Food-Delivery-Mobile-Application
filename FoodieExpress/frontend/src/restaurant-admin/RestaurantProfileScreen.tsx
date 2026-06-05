@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, TextInput, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 import { loadProfileData } from '../utils/profileUtils';
 import { useAlert } from '../utils/AlertContext';
+import UniversalMap from '../components/UniversalMap';
 
 export default function RestaurantProfileScreen() {
     const navigation = useNavigation<any>();
@@ -83,6 +84,26 @@ export default function RestaurantProfileScreen() {
                             <Text className="text-[#A0A0A0] text-xs">Orders</Text>
                         </View>
                     </View>
+                </View>
+
+                {/* 🗺️ OSM Restaurant Location Map */}
+                <View className="px-4 pt-6 pb-2">
+                    <Text className="text-[#A0A0A0] uppercase text-xs font-bold mb-4 ml-2">Restaurant Location</Text>
+                    <View className="rounded-2xl overflow-hidden border border-[#333] mb-3" style={{ height: 180 }}>
+                        <UniversalMap
+                            lat={17.3850}
+                            lng={78.4867}
+                            zoom={15}
+                            markers={[{ id: 'restaurant', lat: 17.3850, lng: 78.4867, title: 'Burger King' }]}
+                        />
+                    </View>
+                    <TouchableOpacity
+                        className="bg-[#1E1E1E] border border-[#1DB954] p-3 rounded-xl flex-row items-center justify-center mb-2"
+                        onPress={() => Linking.openURL('https://www.openstreetmap.org/?mlat=17.3850&mlon=78.4867&zoom=15')}
+                    >
+                        <Text className="text-[#1DB954] font-bold mr-2">🧭</Text>
+                        <Text className="text-[#1DB954] font-bold">View on OpenStreetMap</Text>
+                    </TouchableOpacity>
                 </View>
 
                 {/* Business Info */}
